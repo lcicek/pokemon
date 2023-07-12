@@ -1,0 +1,70 @@
+CLASSES:
+
+- World:
+    - Attributes:
+        - Name (functions as ID) 
+        - Square Array
+        - Interactor Array
+        - Sections (Attributes: From(x, y), To(x, y), Name (e.g. Route 150 or Blabla-City))
+    - Function:
+        - showSection()
+
+- View:
+    - Attributes: 
+        - Width (odd), Height(odd)
+        - CenterX, CenterY
+        - Squares
+        - Interactors
+    - Functions:
+        - updateView(): shifts view by 1 in specific direction
+        - interaction(): checks if (centerX, centerY + targetDirection) square contains interactor and handles it
+
+- Square:
+    - Attributes:
+        - X, Y
+    - Subclasses:
+        - Ground
+            - Pokemon
+                - Grass
+                - Water
+                - Cave
+                - Haunted
+                - TallGrass
+        - Wall
+        - Movement
+            - Ledge
+        - Entrance
+        - Exit
+        - Door (Attributes: Exit, Entrance)
+
+- Interactor
+    - Attributes:
+        - X, Y
+        - Dialogue
+        - Item (default: None)
+    - Subclasses:
+        - Object
+        - Destructable (temporarily walkable until door-event)
+        - NPC
+            - Trainer
+            - Medic
+            - Merchant
+        - PC
+
+- Screen:
+    - Subclasses:
+        - PreGameScreen
+        - GameScreen
+        - BattleScreen
+        - PCScreen
+        - MerchantScreen
+
+_______________________________
+
+STATIC FUNCTIONS:
+    - addItemToBag()
+    - transition(): creates transition from one screen to another.
+_______________________________
+
+EVENTS:
+    - "interact"
