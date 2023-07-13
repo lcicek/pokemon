@@ -31,7 +31,7 @@ while running:
         if event.type == pygame.QUIT: # pygame.QUIT event means the user clicked X to close your window
             running = False
         elif event.type == pygame.VIDEORESIZE:
-            scale = calculateScale(event.dict['size'])
+            scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
             renderer.updateScale(scale)
             screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
