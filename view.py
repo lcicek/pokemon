@@ -1,20 +1,12 @@
+from pygame import Rect
+from parameters import *
+
 class View:
-    def __init__(self, x, y, unit) -> None:
-        self.x = x
-        self.y = y
-        self.unit = unit
-        self.center_x = x // 2
-        self.center_y = y // 2
+    def __init__(self, parent):
+        self.parent = parent
+        self.viewport = Rect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT)
+        self.surface = self.parent.subsurface(self.viewport)
 
-        self.inPixels()
-
-    def inPixels(self):
-        self.width = self.x * self.unit
-        self.height = self.y * self.unit
-        self.center_width = self.center_x * self.unit
-        self.center_height = self.center_y * self.unit
-
-    def setUnit(self, new_unit):
-        self.unit = new_unit
-
-        self.inPixels()
+    def updateViewport(self, delta_x, delta_y): # change
+        self.viewport.move_ip(delta_x * UNIT_SIZE, delta_y * UNIT_SIZE)
+        self.surface = self.parent.subsurface(self.viewport) # update surface being looked at

@@ -1,30 +1,29 @@
 # Example file showing a basic pygame "game loop"
 import pygame
+from pygame import display, RESIZABLE
+
 from threading import Event
 
 from view import View
-from parameters import SCREEN_POS, X, Y
+from parameters import DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT
 from controller import Controller
+from renderer import Renderer
+from location import Location
 from utility import *
 
-BASE = 8
-UNIT = BASE * 2
-
-# init view
-view = View(X, Y, UNIT)
-
-# pygame setup
-pygame.init()
-screen = pygame.display.set_mode((view.width, view.height), pygame.RESIZABLE)
-clock = pygame.time.Clock()
-running = True
-
+# INITIALIZE:
+player = pygame.image.load("player.png")
+location = Location("SafariZone.png", "safari_zone")
+view = View(location.surface)
+renderer = Renderer(location=location)
 move = Event()
 controller = Controller(move)
-image = pygame.image.load("SafariZone.png")
-viewport = pygame.Rect(0, 0, view.width, view.height)
 
-player = pygame.image.load("player.png")
+# SETUP PYGAME:
+pygame.init()
+screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
+clock = pygame.time.Clock()
+running = True
 
 while running:
     # poll for pygame events
@@ -32,23 +31,21 @@ while running:
         if event.type == pygame.QUIT: # pygame.QUIT event means the user clicked X to close your window
             running = False
         elif event.type == pygame.VIDEORESIZE:
-            unit = newUnit(event.dict['size'])
-            view.setUnit(unit) # updates width and height internally
-
-            screen = pygame.display.set_mode((view.width, view.height), pygame.RESIZABLE)
-            pygame.transform.scale(screen, (view.width, view.height))
+            scale = calculateScale(event.dict['size'])
+            renderer.updateScale(scale)
+            screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
     # check for move event
     if move.is_set():
-        viewport = viewport.move(controller.delta_x * UNIT, controller.delta_y * UNIT)
+        view.updateViewport(controller.delta_x, controller.delta_y)
         move.clear()
 
     # clear surface:
     screen.fill("black")
 
     # render current viewport:
-    renderViewport(screen, image, viewport)
-    renderPlayer(screen, player, (view.center_width, view.center_height))
+    renderer.renderViewport(screen, view.surface)
+    renderer.renderPlayer(screen, player)
 
     # update display:
     pygame.display.flip()

@@ -1,21 +1,13 @@
-from parameters import SCREEN_POS, ASPECT_RATIO, BASE, X
+from parameters import VIEWPORT_WIDTH, VIEWPORT_HEIGHT
+import math
 
-def renderViewport(screen, image, viewport, pos=SCREEN_POS):
-    screen.blit(image, pos, viewport)
+def calculateScale(rescaled_size):
+    rescaled_width = rescaled_size[0]
+    rescaled_height = rescaled_size[1]
 
-def renderPlayer(screen, image, pos):
-    screen.blit(image, pos)
+    if rescaled_width != VIEWPORT_WIDTH: # "if the width has been resized"
+        scale = rescaled_width / VIEWPORT_WIDTH
+    else: # "if only the height has been resized"
+        scale = rescaled_height / VIEWPORT_HEIGHT
 
-def roundToBase(x): # rounds x to the closest multiple of base
-    x = BASE * round(x / BASE)
-
-    if x == 0:
-        return BASE
-    else:
-        return x
-
-def newUnit(size):
-    unit = round(size[0] / X)
-    unit = roundToBase(unit)
-
-    return unit
+    return scale
