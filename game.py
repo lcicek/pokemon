@@ -35,8 +35,8 @@ while running:
             unit = newUnit(event.dict['size'])
             view.setUnit(unit) # updates width and height internally
 
-            # screen = pygame.transform.scale(screen, (w, h))
             screen = pygame.display.set_mode((view.width, view.height), pygame.RESIZABLE)
+            pygame.transform.scale(screen, (view.width, view.height))
 
     # check for move event
     if move.is_set():
