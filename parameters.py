@@ -1,4 +1,5 @@
-screen_start = (0, 0)
-unit = 16
-viewport_width = 25 * unit
-viewport_height = 20 * unit
+BASE = 8
+SCREEN_POS = (0, 0)
+X = 32
+Y = 20
+ASPECT_RATIO = X / Y
