@@ -1,28 +1,46 @@
-from parameters import VIEWPORT_WIDTH, VIEWPORT_HEIGHT
+from parameters import VIEWPORT_WIDTH, UNIT_SIZE
 
 def calculateScale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
     return scale
 
-def outOfBounds(center_x, center_y, screen_x, screen_y, image_width, image_height, scale, player_width, player_height):
-    "checks if moving the screen would cause the center square to be outside of image"
+def outOfBounds(player, location, delta_x, delta_y):
+    """ Returns true if the move would cause the player to be out of bounds."""
+    min_x = player.x
+    min_y = player.y
 
-    max_width = image_width * scale - center_x - player_width
-    max_height = image_height * scale - center_y - player_height
+    # note: location.x and location.y are inverted (more details in function direction(key) (see below))
+    max_x = -(location.scaled_width - player.x - player.scaled_width)
+    max_y = -(location.scaled_height - player.y - player.scaled_height)
 
-    if screen_x > center_x:
-        return True
-    elif screen_y > center_y:
-        return True
-    elif -screen_x > max_width:
-        return True
-    elif -screen_y > max_height:
+    if (location.x + delta_x > min_x or #  left
+        location.x + delta_x <= max_x or # right; to compare to max_x we have to invert location.x again
+        location.y + delta_y > min_y or #  top
+        location.y + delta_y <= max_y): #  bottom; to compare to max_y we have to invert location.y again
         return True
     else:
         return False
 
-def renderLocation(screen, location, pos):
-    screen.blit(location.scaled_img, pos)
+def renderGraphic(screen, graphic):
+    screen.blit(graphic.scaled_img, (graphic.x, graphic.y))
 
-def renderPlayer(screen, player):
-    screen.blit(player.scaled_img, (player.x, player.y))
+
+def direction(key):
+    """ If key is in 'wasd', returns INVERTED direction, i.e. going left is not delta_x=-1 but delta_x = 1.
+        That is because we move the image by shifting it across the screen (i.e. like moving a frame across an image).
+        If the player goes left, he wants to discover more squares on the left. To reveal those squares,
+        we move the image to the right: the previously right-most squares will now be hidden, the previously left-most
+        squares will be at position 1, and the new squares will be at the new left-most position 0."""
+
+    if key == 'w': # up
+        delta = [0, 1]
+    elif key == 's': # down
+        delta = [0, -1]
+    elif key == 'a': # left
+        delta = [1, 0]
+    elif key == 'd': # right
+        delta = [-1, 0]
+    else:
+        delta = None
+
+    return delta
