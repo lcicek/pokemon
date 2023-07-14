@@ -1,21 +1,24 @@
 # Example file showing a basic pygame "game loop"
 import pygame
 from pygame import display, RESIZABLE
+import os
 
+from player import Player
 from threading import Event
 from parameters import *
 from controller import Controller
-from renderer import Renderer
 from location import Location
 from utility import *
+
+# WINDOW-POSITION:
+os.environ['SDL_VIDEO_WINDOW_POS'] = "5, 35"
 
 # EVENTS:
 key_press_event = Event()
 
 # INITIALIZE:
-player = pygame.image.load("player.png")
+player = Player("player.png", "player")
 location = Location("SafariZone.png", "safari_zone")
-renderer = Renderer(location=location)
 controller = Controller(key_press_event)
 screen_x = SCREEN_POS[0]
 screen_y = SCREEN_POS[1]
@@ -33,7 +36,8 @@ while running:
             running = False
         elif event.type == pygame.VIDEORESIZE:
             scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
-            renderer.updateScale(scale)
+            player.updateScale(scale)
+            location.updateScale(scale)
             screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
     # clear surface:
@@ -41,16 +45,19 @@ while running:
 
     # check for move event
     if key_press_event.is_set():
-        delta_x = controller.delta_x * UNIT_SIZE * renderer.scale
-        delta_y = controller.delta_y * UNIT_SIZE * renderer.scale
+        delta_x = controller.delta_x * UNIT_SIZE * location.scale
+        delta_y = controller.delta_y * UNIT_SIZE * location.scale
 
         screen_x -= delta_x
         screen_y -= delta_y
 
         key_press_event.clear()
 
-    renderer.renderLocation(screen, location.surface, (screen_x, screen_y))
-    renderer.renderPlayer(screen, player)
+    print(outOfBounds(player.x, player.y, screen_x, screen_y, location.width, location.height, player.scale, player.width, player.height))
+
+    #print((screen_x, screen_y))
+    renderLocation(screen, location, (screen_x, screen_y))
+    renderPlayer(screen, player)
 
     # update display:
     pygame.display.flip()
