@@ -3,21 +3,22 @@ import pygame
 from pygame import display, RESIZABLE
 
 from threading import Event
-
-from view import View
-from parameters import DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT
+from parameters import *
 from controller import Controller
 from renderer import Renderer
 from location import Location
 from utility import *
 
+# EVENTS:
+key_press_event = Event()
+
 # INITIALIZE:
 player = pygame.image.load("player.png")
 location = Location("SafariZone.png", "safari_zone")
-view = View(location.surface)
 renderer = Renderer(location=location)
-move = Event()
-controller = Controller(move)
+controller = Controller(key_press_event)
+screen_x = SCREEN_POS[0]
+screen_y = SCREEN_POS[1]
 
 # SETUP PYGAME:
 pygame.init()
@@ -35,22 +36,26 @@ while running:
             renderer.updateScale(scale)
             screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
-    # check for move event
-    if move.is_set():
-        view.updateViewport(controller.delta_x, controller.delta_y)
-        move.clear()
-
     # clear surface:
     screen.fill("black")
 
-    # render current viewport:
-    renderer.renderViewport(screen, view.surface)
+    # check for move event
+    if key_press_event.is_set():
+        delta_x = controller.delta_x * UNIT_SIZE * renderer.scale
+        delta_y = controller.delta_y * UNIT_SIZE * renderer.scale
+
+        screen_x -= delta_x
+        screen_y -= delta_y
+
+        key_press_event.clear()
+
+    renderer.renderLocation(screen, location.surface, (screen_x, screen_y))
     renderer.renderPlayer(screen, player)
 
     # update display:
     pygame.display.flip()
 
-    clock.tick(30)  # limits FPS to 60
+    clock.tick(20)  # limits FPS to 60
 
 controller.quit()
 pygame.quit()
