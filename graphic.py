@@ -1,22 +1,18 @@
 from pygame import image, transform
-from parameters import DEFAULT_SCALE
+from parameters import DEFAULT_SCALE, UNIT_SIZE
 
 class Graphic:
-    def __init__(self, file, x, y) -> None:
+    def __init__(self, file) -> None:
         self.file = file
         self.src_img = image.load(file)
-        self.width = self.src_img.get_width()
-        self.height = self.src_img.get_height()
+        self.max_x = self.src_img.get_width() // UNIT_SIZE # width in tiles
+        self.max_y = self.src_img.get_height() // UNIT_SIZE # height in tiles
         self.updateScale(DEFAULT_SCALE) # sets self.scale and self.scaled_img
-        self.x = x
-        self.y = y
 
     def updateScale(self, scale):
         self.scale = scale
-        self.scaled_width = self.width * scale
-        self.scaled_height = self.height * scale
-        self.scaled_img = transform.scale(self.src_img, (self.scaled_width, self.scaled_height))
 
-    def updatePos(self, delta_x, delta_y):
-        self.x += delta_x
-        self.y += delta_y
+        scaled_width = self.src_img.get_width() * scale
+        scaled_height = self.src_img.get_height() * scale
+        
+        self.scaled_img = transform.scale(self.src_img, (scaled_width, scaled_height))

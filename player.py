@@ -1,14 +1,12 @@
 from graphic import Graphic
-from parameters import CENTER_WIDTH, CENTER_HEIGHT
+from parameters import PLAYER_SPRITE
 
-class Player(Graphic):
-    def __init__(self, file, x, y) -> None:
-        super().__init__(file, x, y)
+class Player:
+    def __init__(self) -> None:
+        self.x = 0
+        self.y = 0
+        self.graphic = Graphic(PLAYER_SPRITE)
 
-    def recenter(self):
-        self.x = CENTER_WIDTH * self.scale
-        self.y = CENTER_HEIGHT * self.scale
-
-    def updateScale(self, scale):
-        super().updateScale(scale)
-        self.recenter()
+    def updatePos(self, delta_x, delta_y):
+        self.x += delta_x
+        self.y += delta_y

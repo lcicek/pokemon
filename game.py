@@ -18,8 +18,8 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
 key_press_event = Event()
 
 # SETUP SPRITES:
-player = Player(PLAYER_SPRITE, DEFAULT_PLAYER_X, DEFAULT_PLAYER_Y)
-location = Graphic(LOCATION_SPRITE, DEFAULT_SCREEN_X, DEFAULT_SCREEN_Y)
+player = Player()
+location = Graphic(LOCATION_SPRITE)
 
 # INITIALIZE CONTROLLER:
 controller = Controller(key_press_event)
@@ -31,16 +31,16 @@ clock = pygame.time.Clock()
 running = True
 
 # Load map:
-map = pytmx.TiledMap("tiles/map.tmx")
+# map = pytmx.TiledMap("tiles/map.tmx")
 
 while running:
     # poll for pygame events
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: # pygame.QUIT event means the user clicked X to close your window
+        if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.VIDEORESIZE:
             scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
-            player.updateScale(scale)
+            player.graphic.updateScale(scale)
             location.updateScale(scale)
             screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
@@ -49,20 +49,20 @@ while running:
 
     # check for move event
     if key_press_event.is_set():
-        delta_x = controller.delta_x * UNIT_SIZE * location.scale
-        delta_y = controller.delta_y * UNIT_SIZE * location.scale
-        out_of_bounds = outOfBounds(player, location, delta_x, delta_y)
+        out_of_bounds = outOfBounds(player, location, controller.delta_x, controller.delta_y)
+
         if not out_of_bounds:
-            location.updatePos(delta_x, delta_y)
+            player.updatePos(controller.delta_x, controller.delta_y)
+        
         key_press_event.clear()
 
-    renderGraphic(screen, location)
-    renderGraphic(screen, player)
-
+    renderGraphic(screen, location, player)
+    renderPlayer(screen, player)
+    print((player.x, player.y))
     # update display:
     pygame.display.flip()
 
-    clock.tick(20)  # limits FPS to 60
+    clock.tick(20)  # limits FPS to 20
 
 controller.quit()
 pygame.quit()

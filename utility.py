@@ -1,4 +1,4 @@
-from parameters import VIEWPORT_WIDTH, UNIT_SIZE
+from parameters import VIEWPORT_WIDTH, UNIT_SIZE, X_HALF, Y_HALF, CENTER_X_RATIO, CENTER_Y_RATIO
 
 def calculateScale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
@@ -6,40 +6,30 @@ def calculateScale(rescaled_width):
 
 def outOfBounds(player, location, delta_x, delta_y):
     """ Returns true if the move would cause the player to be out of bounds."""
-    min_x = player.x
-    min_y = player.y + player.scaled_width # only because width = height / 2
+    next_x = player.x + delta_x
+    next_y = player.y + delta_y
 
-    # note: location.x and location.y are inverted (more details in function direction(key) (see below))
-    max_x = -(location.scaled_width - player.x - player.scaled_width)
-    max_y = -(location.scaled_height - player.y - player.scaled_height) # having width here is not a mistake
+    return next_x < 0 or next_y < 0 or next_x == location.max_x or next_y == location.max_y
 
-    if (location.x + delta_x > min_x or #  left
-        location.x + delta_x < max_x or # right; to compare to max_x we have to invert location.x again
-        location.y + delta_y > min_y or #  top
-        location.y + delta_y < max_y): #  bottom; to compare to max_y we have to invert location.y again
-        return True
-    else:
-        return False
+def renderPlayer(screen, player): # render player at center 
+    render_x = screen.get_width() * CENTER_X_RATIO
+    render_y = screen.get_height() * CENTER_Y_RATIO
+    screen.blit(player.graphic.scaled_img, (render_x, render_y))
 
-def renderGraphic(screen, graphic):
-    screen.blit(graphic.scaled_img, (graphic.x, graphic.y))
-
+def renderGraphic(screen, graphic, player): 
+    render_x = (-player.x + X_HALF) * UNIT_SIZE * player.graphic.scale 
+    render_y = (-player.y + Y_HALF) * UNIT_SIZE * player.graphic.scale
+    screen.blit(graphic.scaled_img, (render_x, render_y))
 
 def direction(key):
-    """ If key is in 'wasd', returns INVERTED direction, i.e. going left is not delta_x=-1 but delta_x = 1.
-        That is because we move the image by shifting it across the screen (i.e. like moving a frame across an image).
-        If the player goes left, he wants to discover more squares on the left. To reveal those squares,
-        we move the image to the right: the previously right-most squares will now be hidden, the previously left-most
-        squares will be at position 1, and the new squares will be at the new left-most position 0."""
-
     if key == 'w': # up
-        delta = [0, 1]
-    elif key == 's': # down
         delta = [0, -1]
+    elif key == 's': # down
+        delta = [0, 1]
     elif key == 'a': # left
-        delta = [1, 0]
-    elif key == 'd': # right
         delta = [-1, 0]
+    elif key == 'd': # right
+        delta = [1, 0]
     else:
         delta = None
 
