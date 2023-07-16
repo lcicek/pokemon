@@ -2,8 +2,10 @@
 import pygame
 from pygame import display, RESIZABLE
 import os
+import pytmx
 
 from graphic import Graphic
+from player import Player
 from threading import Event
 from parameters import *
 from controller import Controller
@@ -16,7 +18,7 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
 key_press_event = Event()
 
 # SETUP SPRITES:
-player = Graphic(PLAYER_SPRITE, DEFAULT_PLAYER_X, DEFAULT_PLAYER_Y)
+player = Player(PLAYER_SPRITE, DEFAULT_PLAYER_X, DEFAULT_PLAYER_Y)
 location = Graphic(LOCATION_SPRITE, DEFAULT_SCREEN_X, DEFAULT_SCREEN_Y)
 
 # INITIALIZE CONTROLLER:
@@ -27,6 +29,9 @@ pygame.init()
 screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
+
+# Load map:
+map = pytmx.TiledMap("tiles/map.tmx")
 
 while running:
     # poll for pygame events

@@ -23,4 +23,4 @@ DEFAULT_PLAYER_Y = CENTER_HEIGHT * DEFAULT_SCALE
 
 # IMAGES:
 PLAYER_SPRITE = "sprites/player.png"
-LOCATION_SPRITE = "sprites/SafariZone.png"
+LOCATION_SPRITE = "tiles/map.png"
