@@ -9,7 +9,7 @@ def outOfBounds(player, location, delta_x, delta_y):
     next_x = player.x + delta_x
     next_y = player.y + delta_y
 
-    return next_x < 0 or next_y < 0 or next_x == location.width or next_y == location.height
+    return next_x < 0 or next_y < 0 or next_x == location.max_x or next_y == location.max_y
 
 def renderPlayer(screen, player): # render player at center 
     render_x = screen.get_width() * CENTER_X_RATIO
