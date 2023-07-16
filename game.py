@@ -2,7 +2,6 @@
 import pygame
 from pygame import display, RESIZABLE
 import os
-import pytmx
 
 from graphic import Graphic
 from player import Player
@@ -30,9 +29,6 @@ screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), 
 clock = pygame.time.Clock()
 running = True
 
-# Load map:
-# map = pytmx.TiledMap("tiles/map.tmx")
-
 while running:
     # poll for pygame events
     for event in pygame.event.get():
@@ -58,7 +54,6 @@ while running:
 
     renderGraphic(screen, location, player)
     renderPlayer(screen, player)
-    print((player.x, player.y))
     # update display:
     pygame.display.flip()
 
