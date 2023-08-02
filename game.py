@@ -44,13 +44,13 @@ while running:
     # clear surface:
     screen.fill("black")
 
-    handle_movement(key_press_event, controller)
+    handle_movement(key_press_event, controller, player)
+    handle_render(screen, player)
 
     #renderGraphic(screen, location, player)
     #renderPlayer(screen, player)
     # update display:
     pygame.display.flip()
-
     clock.tick(20)  # limits FPS to 20
 
 controller.quit()

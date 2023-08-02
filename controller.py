@@ -1,5 +1,8 @@
 from pynput.keyboard import Listener
 from time import perf_counter_ns
+from parameters import (
+    LEFT, RIGHT, UP, DOWN
+)
 
 class Controller:
     def __init__(self, key_press_event) -> None:
@@ -9,8 +12,7 @@ class Controller:
         self.pressed_keys = set()
         self.press_start_time = None 
 
-        self.delta_x = 0
-        self.delta_y = 1
+        self.direction = DOWN
 
         self.start()
 
@@ -25,19 +27,20 @@ class Controller:
         """
         press_start_time = perf_counter_ns()
         key = key.char
-        delta = delta_of_valid_key(key)
+        direction = key_to_direction(key)
 
-        if delta is None: # invalid key
+        if direction is None: # invalid key
             return
 
         self.pressed_keys.add(key) # track if additional valid keys are being pressed
+        print(self.pressed_keys)
 
         if self.key_press_event.is_set(): # ...but don't do anything with additional pressed keys here (we handle them in on_release)
             return
 
         # else: first and only key press
         self.press_start_time = press_start_time
-        self.update_delta(delta)
+        self.update_direction(direction)
         self.key_press_event.set() # set event flag to true
 
     def on_release(self, key):
@@ -54,27 +57,18 @@ class Controller:
         if len(self.pressed_keys) == 0: # event is over
             self.key_press_event.clear()
         elif len(self.pressed_keys) == 1: # if multiple keys were pressed: make sure that for the last pressed key left, the corresponding delta is used
-            delta = delta_of_valid_key(key)
-            self.update_delta(delta)
+            self.update_direction(key_to_direction(key))
 
-    def update_delta(self, delta):
-        assert delta is not None
-
-        self.delta_x = delta[0]
-        self.delta_y = delta[1]
+    def update_direction(self, direction):
+        assert direction is not None
+        self.direction = direction
 
     def quit(self):
         self.listener.stop()
 
 # not part of class
-def delta_of_valid_key(key):
-        if key == 'w': # up
-            return (0, -1)
-        elif key == 's': # down
-            return (0, 1)
-        elif key == 'a': # left
-            return (-1, 0)
-        elif key == 'd': # right
-            return (1, 0)
+def key_to_direction(key):
+        if key in [UP, DOWN, LEFT, RIGHT]:
+            return key
         else:
             return None

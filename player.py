@@ -16,12 +16,26 @@ class Player:
 
         self.animation = PlayerAnimation()
 
-    def turn(self, delta_x, delta_y):
-        self.update_direction(delta_x= delta_x, delta_y=delta_y)
+    def turns(self, new_direction):
+        return self.direction != new_direction
 
-    def update_position(self, delta_x, delta_y):
-        self.x += delta_x
-        self.y += delta_y
+    def is_standing(self):
+        return self.action == STANDING
+
+    def update_animation(self):
+        self.animation.update_active_frame(self.move_state, self.move_bit)
+
+    def update_position(self, direction):
+        if direction == UP:
+            self.y -= 1
+        elif direction == DOWN:
+            self.y += 1
+        elif direction == LEFT:
+            self.x -= 1
+        elif direction == RIGHT:
+            self.x += 1
+        else:
+            raise RuntimeError("Invalid value for direction.")
 
     def update_move_bit(self):
         self.move_bit ^= 1 # flip bit
@@ -31,23 +45,14 @@ class Player:
 
     def update_action(self, action):
         self.action = action
+
+        if action != STANDING:
+            self.update_move_bit()
+        
         self.update_move_state()
 
-    def update_direction(self, delta_x, delta_y):
-        delta = (delta_x, delta_y)
-
-        if delta == (-1, 0):
-            self.direction = LEFT
-        elif delta == (1, 0):
-            self.direction = RIGHT
-        elif delta == (0, -1):
-            self.direction = UP
-        elif delta == (0, 1):
-            self.direction = DOWN
-        else:
-            raise RuntimeError("The delta_x, delta_y tuple is invalid.")
-
-        self.update_move_bit()
+    def update_direction(self, new_direction):
+        self.direction = new_direction
         self.update_move_state()
 
     def is_in_bounds(self, location, delta_x, delta_y):

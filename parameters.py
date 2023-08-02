@@ -22,14 +22,18 @@ DEFAULT_SCREEN_WIDTH = VIEWPORT_WIDTH * DEFAULT_SCALE
 DEFAULT_SCREEN_HEIGHT = VIEWPORT_HEIGHT * DEFAULT_SCALE
 
 ### TIME ###
-TURN_TIME = 200 # in milliseconds
+FPS = 25
+TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
+
+MOVE_DURATION = 300
+TURN_DURATION = 100
 NS_TO_MS_RATIO = 1_000_000 # e.g. 200_000_000 ns = 200 ms (= 0.2s)
 
 ### DIRECTION ###
-LEFT = "left"
-RIGHT = "right"
-UP = "up"
-DOWN = "down"
+LEFT = 'a'
+RIGHT = 'd'
+UP = 'w'
+DOWN = 's'
 
 ### ACTION ###
 STANDING = "standing"
