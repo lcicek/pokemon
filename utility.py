@@ -1,36 +1,44 @@
-from parameters import VIEWPORT_WIDTH, UNIT_SIZE, X_HALF, Y_HALF, CENTER_X_RATIO, CENTER_Y_RATIO
+from time import perf_counter_ns
+from pygame.time import delay
+
+from parameters import (
+    VIEWPORT_WIDTH, UNIT_SIZE,
+    X_HALF, Y_HALF,
+    CENTER_X_RATIO, CENTER_Y_RATIO,
+    TURN_TIME, NS_TO_MS_RATIO
+)
+
+def renderPlayer(screen, player): # render player at center 
+        render_x = screen.get_width() * CENTER_X_RATIO
+        render_y = screen.get_height() * CENTER_Y_RATIO
+        screen.blit(player.idle_graphic.scaled_img, (render_x, render_y))
+
+def renderGraphic(screen, graphic, player): 
+    render_x = (-player.x + X_HALF) * UNIT_SIZE * player.idle_graphic.scale 
+    render_y = (-player.y + Y_HALF) * UNIT_SIZE * player.idle_graphic.scale
+    screen.blit(graphic.scaled_img, (render_x, render_y))
 
 def calculateScale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
     return scale
 
-def outOfBounds(player, location, delta_x, delta_y):
-    """ Returns true if the move would cause the player to be out of bounds."""
-    next_x = player.x + delta_x
-    next_y = player.y + delta_y
+def delay_movement(start_time):
+    elapsed_time_ns = perf_counter_ns() - start_time
+    elapsed_time_ms = elapsed_time_ns / NS_TO_MS_RATIO
+    remaining_time_ms = TURN_TIME - elapsed_time_ms
 
-    return next_x < 0 or next_y < 0 or next_x == location.max_x or next_y == location.max_y
+    if remaining_time_ms > 0:
+        delay(int(remaining_time_ms))
+    
+def handle_movement(key_press_event, controller):
+    if key_press_event.is_set():
+        delay_movement(controller.press_start_time)
 
-def renderPlayer(screen, player): # render player at center 
-    render_x = screen.get_width() * CENTER_X_RATIO
-    render_y = screen.get_height() * CENTER_Y_RATIO
-    screen.blit(player.graphic.scaled_img, (render_x, render_y))
+        if not key_press_event.is_set(): # if key was released quickly
+            print("turn occured")
+            pass
 
-def renderGraphic(screen, graphic, player): 
-    render_x = (-player.x + X_HALF) * UNIT_SIZE * player.graphic.scale 
-    render_y = (-player.y + Y_HALF) * UNIT_SIZE * player.graphic.scale
-    screen.blit(graphic.scaled_img, (render_x, render_y))
-
-def direction(key):
-    if key == 'w': # up
-        delta = [0, -1]
-    elif key == 's': # down
-        delta = [0, 1]
-    elif key == 'a': # left
-        delta = [-1, 0]
-    elif key == 'd': # right
-        delta = [1, 0]
-    else:
-        delta = None
-
-    return delta
+        # move:
+        #if player.isInBounds(location, controller.delta_x, controller.delta_y):
+        #    player.updatePosition(controller.delta_x, controller.delta_y)
+        #    walking_event.set()

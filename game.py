@@ -15,10 +15,11 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
 
 # EVENTS:
 key_press_event = Event()
+walking_event = Event()
 
 # SETUP SPRITES:
 player = Player()
-location = Graphic(LOCATION_SPRITE)
+#location = Graphic(LOCATION_SPRITE)
 
 # INITIALIZE CONTROLLER:
 controller = Controller(key_press_event)
@@ -34,26 +35,19 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.VIDEORESIZE:
-            scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
-            player.graphic.updateScale(scale)
-            location.updateScale(scale)
-            screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
+        #elif event.type == pygame.VIDEORESIZE:
+        #    scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
+        #    player.graphic.updateScale(scale)
+        #    location.updateScale(scale)
+        #    screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
     # clear surface:
     screen.fill("black")
 
-    # check for move event
-    if key_press_event.is_set():
-        out_of_bounds = outOfBounds(player, location, controller.delta_x, controller.delta_y)
+    handle_movement(key_press_event, controller)
 
-        if not out_of_bounds:
-            player.updatePos(controller.delta_x, controller.delta_y)
-        
-        key_press_event.clear()
-
-    renderGraphic(screen, location, player)
-    renderPlayer(screen, player)
+    #renderGraphic(screen, location, player)
+    #renderPlayer(screen, player)
     # update display:
     pygame.display.flip()
 
