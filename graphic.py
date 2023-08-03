@@ -10,8 +10,8 @@ class Graphic:
         self.scale = None
         self.scaled_image = None # initialized by calling update_scale() in line 13
 
-        self.max_x = self.image.get_width() // UNIT_SIZE # width in tiles
-        self.max_y = self.image.get_height() // UNIT_SIZE # height in tiles
+        self.width = self.image.get_width() // UNIT_SIZE # width in tiles
+        self.height = self.image.get_height() // UNIT_SIZE # height in tiles
         
         self.update_scale(DEFAULT_SCALE) # sets self.scale and self.scaled_img
 

@@ -9,6 +9,7 @@ from player import Player
 from parameters import *
 from controller import Controller
 from utility import *
+from handler import handle_input, handle_render
 
 # Set position window will open up at:
 os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
@@ -44,7 +45,7 @@ while running:
     # clear surface:
     screen.fill("black")
 
-    handle_input(controller, player, move_lock)
+    handle_input(controller, player, location, move_lock)
     handle_render(screen, player, location, move_lock=move_lock)
 
     #renderGraphic(screen, location, player)
