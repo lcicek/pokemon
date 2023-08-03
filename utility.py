@@ -1,12 +1,10 @@
-from time import perf_counter_ns
-from pygame.time import delay
+from pygame import time
 
 from parameters import (
     VIEWPORT_WIDTH, UNIT_SIZE,
     X_HALF, Y_HALF,
     CENTER_X_RATIO, CENTER_Y_RATIO,
-    TURN_DURATION, NS_TO_MS_RATIO, MOVE_DURATION,
-    WALKING, STANDING
+    WALKING, STANDING, LEFT
 )
 
 def handle_render(screen, player):
@@ -27,36 +25,51 @@ def calculateScale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
     return scale
 
-def relative_delay(start_time):
-    elapsed_time_ns = perf_counter_ns() - start_time
-    elapsed_time_ms = elapsed_time_ns / NS_TO_MS_RATIO
-    remaining_time_ms = TURN_DURATION - elapsed_time_ms
-
-    if remaining_time_ms > 0:
-        delay(int(remaining_time_ms)) # temporarily decreases fps because MOVE_DURATION / TIME_PER_FRAME frames are skipped
-
-def update_player(player, state, direction):
-    player.update_action(state)
+def update_player(player, action, direction):
+    player.update_action(action)
     player.update_direction(direction)
     player.update_position(direction)
     player.update_animation()
 
-def handle_movement(key_press_event, controller, player):
-    key_is_pressed = key_press_event.is_set()
+def stop(player):
+    player.update_action(STANDING)
+    player.update_animation()
 
-    if not key_is_pressed and player.is_standing(): # player did nothing
-        return
+def turn(player, direction):
+    update_player(player, STANDING, direction)
+
+def walk(player, direction):
+    update_player(player, WALKING, direction)
+
+def update_movement_lock(executed_move, move_lock):
+    if executed_move:
+        start_time = time.get_ticks()
+        move_lock.lock(start_time)
+
+def execute_movement(input_direction, player):
+    if input_direction is None and player.is_standing():
+        return False
+
+    player_stopped_moving = input_direction is None and not player.is_standing()
+    direction_is_new = player.direction != input_direction
+
+    if player_stopped_moving:
+        stop(player)
+    elif direction_is_new:
+        turn(player, input_direction)
+    else:
+        walk(player, input_direction)
     
-    if key_is_pressed and player.is_standing() and player.turns(controller.direction):
-        # allow small interval to enable player to turn without moving (via quick press and release of key)
-        relative_delay(controller.press_start_time)
-        update_player(player, STANDING, controller.direction)
-    elif key_is_pressed: # player moves
-        #if player.is_in_bounds(location, controller.delta_x, controller.delta_y):
-        delay(MOVE_DURATION)
-        update_player(player, WALKING, controller.direction)
-    else: # player stopped moving
-        update_player(player, STANDING, controller.direction)
+    return True
+
+def handle_input(controller, player, move_lock):
+    input_direction = controller.listen()
+
+    if move_lock.is_unlocked():
+        executed_move = execute_movement(input_direction, player)
+        update_movement_lock(executed_move, move_lock)
+    else:
+        move_lock.try_unlock()
 
         # move:
         #if player.isInBounds(location, controller.delta_x, controller.delta_y):

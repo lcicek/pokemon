@@ -3,9 +3,9 @@ import pygame
 from pygame import display, RESIZABLE
 import os
 
+from lock import Lock
 from graphic import Graphic
 from player import Player
-from threading import Event
 from parameters import *
 from controller import Controller
 from utility import *
@@ -13,22 +13,20 @@ from utility import *
 # Set position window will open up at:
 os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
 
-# EVENTS:
-key_press_event = Event()
-walking_event = Event()
-
-# SETUP SPRITES:
-player = Player()
-#location = Graphic(LOCATION_SPRITE)
-
-# INITIALIZE CONTROLLER:
-controller = Controller(key_press_event)
-
 # SETUP PYGAME:
 pygame.init()
 screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
+
+# SETUP SPRITES:
+player = Player()
+#location = Graphic(LOCATION_SPRITE)
+
+controller = Controller()
+
+### INIT LOCKS ###
+move_lock = Lock(WALK_DURATION)
 
 while running:
     # poll for pygame events
@@ -41,17 +39,18 @@ while running:
         #    location.updateScale(scale)
         #    screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
+    # Check for more "events":
+
     # clear surface:
     screen.fill("black")
 
-    handle_movement(key_press_event, controller, player)
+    handle_input(controller, player, move_lock)
     handle_render(screen, player)
 
     #renderGraphic(screen, location, player)
     #renderPlayer(screen, player)
     # update display:
     pygame.display.flip()
-    clock.tick(20)  # limits FPS to 20
+    clock.tick(FPS)
 
-controller.quit()
 pygame.quit()
