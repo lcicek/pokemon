@@ -9,7 +9,8 @@ from player import Player
 from parameters import *
 from controller import Controller
 from utility import *
-from handler import handle_input, handle_render
+from movementHandler import handle_input
+from renderHandler import handle_render
 
 # Set position window will open up at:
 os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
