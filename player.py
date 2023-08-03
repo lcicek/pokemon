@@ -1,7 +1,8 @@
 from playerAnimation import PlayerAnimation
 from parameters import (
     LEFT, RIGHT, UP, DOWN, 
-    STANDING, WALKING, SPRINTING
+    STANDING, WALKING,
+    WALK_CYCLE_FRAMES
 )
 
 class Player:
@@ -9,23 +10,34 @@ class Player:
         self.x = 0
         self.y = 0
 
+        self.prev_x = None
+        self.prev_y = None
+
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
         self.move_state = (self.action, self.direction)
-        self.move_bit = 0 # to track left and right step for animation (no matter the direction)
+        self.move_frame = 0 # 4 possible frames per move cycle
 
         self.animation = PlayerAnimation()
 
     def turns(self, new_direction):
         return self.direction != new_direction
 
+    def is_walking(self):
+        return self.action == WALKING
+
     def is_standing(self):
         return self.action == STANDING
 
     def update_animation(self):
-        self.animation.update_active_frame(self.move_state, self.move_bit)
+        self.animation.update_active_frame(self.move_state, self.move_frame)
 
     def update_position(self, direction):
+        self.next_move_frame()
+
+        self.prev_x = self.x
+        self.prev_y = self.y
+
         if direction == UP:
             self.y -= 1
         elif direction == DOWN:
@@ -37,18 +49,20 @@ class Player:
         else:
             raise RuntimeError("Invalid value for direction.")
 
-    def update_move_bit(self):
-        self.move_bit ^= 1 # flip bit
+    def next_move_frame(self):
+        self.move_frame = (self.move_frame + 1) % WALK_CYCLE_FRAMES
 
     def update_move_state(self):
         self.move_state = (self.action, self.direction)
 
     def update_action(self, action):
-        self.action = action
+        if self.action == action:
+            return
 
-        if action != STANDING:
-            self.update_move_bit()
-        
+        if action == WALKING:
+            self.move_frame = 0 if self.move_frame >= 2 else 2 # set correct spot in walk cycle
+
+        self.action = action
         self.update_move_state()
 
     def update_direction(self, new_direction):

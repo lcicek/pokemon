@@ -21,12 +21,12 @@ running = True
 
 # SETUP SPRITES:
 player = Player()
-#location = Graphic(LOCATION_SPRITE)
+location = Graphic(LOCATION_SPRITE)
 
 controller = Controller()
 
 ### INIT LOCKS ###
-move_lock = Lock(WALK_DURATION)
+move_lock = Lock()
 
 while running:
     # poll for pygame events
@@ -45,7 +45,7 @@ while running:
     screen.fill("black")
 
     handle_input(controller, player, move_lock)
-    handle_render(screen, player)
+    handle_render(screen, player, location, move_lock=move_lock)
 
     #renderGraphic(screen, location, player)
     #renderPlayer(screen, player)

@@ -7,6 +7,7 @@ class Graphic:
     def __init__(self, file) -> None:
         self.file = file
         self.image = image.load(file)
+        self.scale = None
         self.scaled_image = None # initialized by calling update_scale() in line 13
 
         self.max_x = self.image.get_width() // UNIT_SIZE # width in tiles
