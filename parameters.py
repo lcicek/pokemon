@@ -39,6 +39,13 @@ STANDING = "standing"
 WALKING = "walking"
 SPRINTING = "sprinting"
 
+### TILED ###
+TILED_MAP_PATH = "tiles/maps/map_logic.tmx"
+
+### LOCATION SPRITES ###
+LOCATION_SPRITE = "tiles/render-images/map.png"
+LOCATION_FOREGROUND = "tiles/render-images/map_foreground.png"
+
 ### PLAYER SPRITES FOR ANIMATION ###
 STANDING_FRONT = "sprites/player/standing-front.png"
 STANDING_BACK = "sprites/player/standing-back.png"
@@ -54,6 +61,3 @@ WALKING_FRONT_2 = "sprites/player/walking-front2.png"
 WALKING_BACK_2 = "sprites/player/walking-back2.png"
 WALKING_LEFT_2 = "sprites/player/walking-left2.png"
 WALKING_RIGHT_2 = "sprites/player/walking-right2.png"
-
-### LOCATION SPRITES ###
-LOCATION_SPRITE = "tiles/map.png"

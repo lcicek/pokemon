@@ -5,6 +5,7 @@ import os
 
 from lock import Lock
 from graphic import Graphic
+from location import Location
 from player import Player
 from parameters import *
 from controller import Controller
@@ -23,7 +24,7 @@ running = True
 
 # SETUP SPRITES:
 player = Player()
-location = Graphic(LOCATION_SPRITE)
+location = Location(LOCATION_SPRITE, LOCATION_FOREGROUND)
 
 controller = Controller()
 

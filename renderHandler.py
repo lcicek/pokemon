@@ -6,8 +6,9 @@ from parameters import (
 
 def handle_render(screen, player, location, move_lock):
     x, y = calculate_location_position(player, location, move_lock)
-    renderGraphic(screen, location, x, y)
+    renderGraphic(screen, location.graphic, x, y)
     renderPlayer(screen, player)
+    renderGraphic(screen, location.foreground_graphic, x, y)
 
 def renderPlayer(screen, player): # render player at center 
         render_x = screen.get_width() * CENTER_X_RATIO
@@ -22,13 +23,13 @@ def calculate_location_position(player, location, move_lock):
     player_did_not_walk = move_lock.is_unlocked() or player.is_standing()
 
     if player_did_not_walk or player.bumped():
-        x, y = target_render_position(player, location)
+        x, y = target_render_position(player, location.graphic)
     else:
         delta_x, delta_y = player.get_previous_delta()
 
         x = intermediate_position(player.prev_x, move_lock.frame_count(), delta_x)
         y = intermediate_position(player.prev_y, move_lock.frame_count(), delta_y)
-        x, y = position_to_render_position(x, y, location)
+        x, y = position_to_render_position(x, y, location.graphic)
 
     return x, y
 

@@ -7,11 +7,11 @@ from parameters import (
 
 class Player:
     def __init__(self) -> None:
-        self.x = 0
-        self.y = 0
+        self.x = 10
+        self.y = 11
 
-        self.prev_x = 0
-        self.prev_y = 0
+        self.prev_x = 10
+        self.prev_y = 11
 
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
@@ -83,11 +83,7 @@ class Player:
     def is_at_edge(self, location):
         return self.x == 0 or self.y == 0 or self.x == location.width-1 or self.y == location.height-1
 
-    def next_is_out_of_bounds(self, location, direction):
-        return not self.next_is_in_bounds(location, direction)
-
-    def next_is_in_bounds(self, location, direction):
-        """ Returns true if the next move is still in bounds of location."""
+    def next_coordinates(self, direction):
         next_x = self.x
         next_y = self.y
 
@@ -100,4 +96,17 @@ class Player:
         else:
             next_y += 1
 
+        return next_x, next_y
+
+
+    def next_step_is_valid(self, location, direction):
+        next_x, next_y = self.next_coordinates(direction)
+        next_is_solid = location.map[next_y][next_x].is_solid() # y = row, x = col 
+
+        return not (next_is_solid or self.next_is_out_of_bounds(next_x, next_y, location))
+
+    def next_is_out_of_bounds(self, next_x, next_y, location):
+        return not self.next_is_in_bounds(next_x, next_y, location)
+
+    def next_is_in_bounds(self, next_x, next_y, location):
         return next_x >= 0 and next_y >= 0 and next_x < location.width and next_y < location.height

@@ -27,10 +27,10 @@ def execute_movement(input_direction, player, location):
         turn(player, input_direction)
     else:
         # move:
-        if player.next_is_out_of_bounds(location, input_direction):
-            bump(player, input_direction)
-        else:
+        if player.next_step_is_valid(location, input_direction):
             walk(player, input_direction)
+        else:
+            bump(player, input_direction)
     
     return True
 
