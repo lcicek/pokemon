@@ -1,4 +1,7 @@
-from parameters import WALKING, STANDING
+from parameters import (
+    WALKING, STANDING, JUMPING,
+    LEFT, RIGHT, UP
+)
 
 def handle_input(controller, player, location, move_lock):
     input_direction = controller.listen()
@@ -9,14 +12,13 @@ def handle_input(controller, player, location, move_lock):
         if executed_move:
             move_lock.lock()
     else:
-        move_lock.try_unlock(player.is_walking())
+        move_lock.try_unlock(player)
 
 def execute_movement(input_direction, player, location):
-    # case: player stands and there is no new input
-    if input_direction is None and player.is_standing():
+    if input_direction is None and player.is_standing(): # player stands and there is no new input:
         return False
 
-    player_stopped_moving = input_direction is None and player.is_walking()
+    player_stopped_moving = input_direction is None and (player.is_walking() or player.is_jumping())
     direction_is_new = player.direction != input_direction
 
     if player_stopped_moving:
@@ -25,12 +27,12 @@ def execute_movement(input_direction, player, location):
     
     if direction_is_new and player.is_standing():
         turn(player, input_direction)
+    elif next_square_is_jumpable(player, location, input_direction):
+        jump(player, input_direction)
+    elif next_square_is_walkable(player, location, input_direction):
+        walk(player, input_direction)
     else:
-        # move:
-        if player.next_step_is_valid(location, input_direction):
-            walk(player, input_direction)
-        else:
-            bump(player, input_direction)
+        bump(player, input_direction)
     
     return True
 
@@ -49,9 +51,46 @@ def bump(player, direction):
     player.update_previous_position()
     player.next_move_frame()
     
+def jump(player, direction):
+    player.update_action(JUMPING)
+    player.update_direction(direction)
+    player.update_animation()
+    player.jump(direction)
 
 def walk(player, direction):
     player.update_action(WALKING)
     player.update_direction(direction)
     player.update_animation()
-    player.update_position(direction)
+    player.walk(direction)
+
+def next_coordinates(player, direction):
+        next_x = player.x
+        next_y = player.y
+
+        if direction == LEFT:
+            next_x -= 1
+        elif direction == RIGHT:
+            next_x += 1
+        elif direction == UP:
+            next_y -= 1
+        else:
+            next_y += 1
+
+        return next_x, next_y
+
+def next_square_is_jumpable(player, location, direction):
+    next_x, next_y = next_coordinates(player, direction)
+    
+    return location.square_is_jumping_ledge(next_y, next_x, direction)
+
+def next_square_is_walkable(player, location, direction):
+    next_x, next_y = next_coordinates(player, direction)
+    next_blocks = location.square_is_solid(next_y, next_x, direction)
+    
+    return not (next_blocks or next_is_out_of_bounds(next_x, next_y, location))
+
+def next_is_out_of_bounds(next_x, next_y, location):
+    return not next_is_in_bounds(next_x, next_y, location)
+
+def next_is_in_bounds(next_x, next_y, location):
+    return next_x >= 0 and next_y >= 0 and next_x < location.width and next_y < location.height

@@ -1,10 +1,16 @@
 from graphic import Graphic
 from parameters import (
     STANDING_FRONT, STANDING_BACK, STANDING_LEFT, STANDING_RIGHT,
-    WALKING_FRONT, WALKING_BACK, WALKING_LEFT, WALKING_RIGHT,
-    WALKING_FRONT_2, WALKING_BACK_2, WALKING_LEFT_2, WALKING_RIGHT_2,
+    WALKING_FRONT, WALKING_FRONT_2,
+    WALKING_BACK, WALKING_BACK_2, 
+    WALKING_LEFT, WALKING_LEFT_2,
+    WALKING_RIGHT, WALKING_RIGHT_2,
+    JUMPING_DOWN_1, JUMPING_DOWN_2, JUMPING_DOWN_3,
+    JUMPING_UP_1, JUMPING_UP_2, JUMPING_UP_3,
+    JUMPING_LEFT_1, JUMPING_LEFT_2, JUMPING_LEFT_3, 
+    JUMPING_RIGHT_1, JUMPING_RIGHT_2, JUMPING_RIGHT_3,
     LEFT, RIGHT, UP, DOWN,
-    STANDING, WALKING
+    STANDING, WALKING, JUMPING
 )
 
 class PlayerAnimation:
@@ -33,16 +39,26 @@ class PlayerAnimation:
             (WALKING, RIGHT): [Graphic(WALKING_RIGHT), Graphic(STANDING_RIGHT), Graphic(WALKING_RIGHT_2), Graphic(STANDING_RIGHT)]
         }
 
+        jump_cycle_frames = {
+            (JUMPING, DOWN): [Graphic(JUMPING_DOWN_1), Graphic(JUMPING_DOWN_2), Graphic(JUMPING_DOWN_3), Graphic(STANDING_FRONT)],
+            (JUMPING, UP): [Graphic(JUMPING_UP_1), Graphic(JUMPING_UP_2), Graphic(JUMPING_UP_3), Graphic(STANDING_BACK)],
+            (JUMPING, LEFT): [Graphic(JUMPING_LEFT_1), Graphic(JUMPING_LEFT_2), Graphic(JUMPING_LEFT_3), Graphic(STANDING_LEFT)],
+            (JUMPING, RIGHT): [Graphic(JUMPING_RIGHT_1), Graphic(JUMPING_RIGHT_2), Graphic(JUMPING_RIGHT_3), Graphic(STANDING_RIGHT)]
+        }
+
         frames = []
-        frames.extend([standing_frames, walk_cycle_frames])
+        frames.extend([standing_frames, walk_cycle_frames, jump_cycle_frames])
         self.frames = frames
 
     def update_active_frame(self, move_state, move_frame=None):
         if move_state in self.frames[0]:
             self.active_frame = self.get_standing_frame(move_state)
         elif move_state in self.frames[1] and move_frame is not None:
-            self.active_frame = self.get_walking_frame(move_state=move_state, move_frame=move_frame)
+            self.active_frame = self.get_move_frame(move_state, move_frame, 1)
+        elif move_state in self.frames[2] and move_frame is not None:
+            self.active_frame = self.get_move_frame(move_state, move_frame, 2)
         else:
+            print(move_state)
             raise RuntimeError("Found invalid state while trying to find current player frame.")
 
     def rescale_stand_frames(self, scale):
@@ -61,8 +77,8 @@ class PlayerAnimation:
     def get_standing_frame(self, move_state):
         return self.frames[0][move_state].scaled_image
     
-    def get_walking_frame(self, move_state, move_frame):
-        walk_frames = self.frames[1][move_state]
+    def get_move_frame(self, move_state, move_frame, state_index):
+        walk_frames = self.frames[state_index][move_state]
         frame = walk_frames[move_frame]
 
         return frame.scaled_image

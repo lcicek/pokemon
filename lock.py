@@ -1,5 +1,5 @@
 from pygame import time
-from parameters import FRAMES_PER_WALK, FRAMES_PER_STANDING_TURN
+from parameters import FRAMES_PER_WALK, FRAMES_PER_STANDING_TURN, FRAMES_PER_JUMP
 
 class Lock:
     def __init__(self) -> None:
@@ -21,18 +21,20 @@ class Lock:
         self.locked = True
         self.frames_since_lock = 1
 
-    def try_unlock(self, player_is_walking):
+    def try_unlock(self, player):
         if self.is_unlocked():
             return
 
-        if self.lock_elapsed(player_is_walking):
+        if self.lock_elapsed(player):
             self.locked = False
         else:
             self.frames_since_lock += 1
 
-    def lock_elapsed(self, player_is_walking):
-        if player_is_walking:
+    def lock_elapsed(self, player):
+        if player.is_walking():
             lock_duration = FRAMES_PER_WALK
+        elif player.is_jumping():
+            lock_duration = FRAMES_PER_JUMP
         else:
             lock_duration = FRAMES_PER_STANDING_TURN
 

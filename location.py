@@ -18,6 +18,12 @@ class Location:
         self.width = self.graphic.image.get_width() // UNIT_SIZE # width in tiles
         self.height = self.graphic.image.get_height() // UNIT_SIZE # height in tiles
 
+    def square_is_solid(self, col, row, direction):
+        return self.map[col][row].is_solid() or self.map[col][row].is_blocking_ledge(direction)
+
+    def square_is_jumping_ledge(self, col, row, direction):
+        return self.map[col][row].is_jumping_ledge(direction)
+
     def init_map(self):
         tree = ET.parse(TILED_MAP_PATH)
         root = tree.getroot()

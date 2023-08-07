@@ -15,8 +15,11 @@ class Square:
     def is_solid(self):
         return self.solid
 
-    def is_ledge(self):
+    def ledge_exists(self):
         return self.ledge is not None
     
-    def ledge_blocks(self, direction):
-        return self.ledge != direction
+    def is_jumping_ledge(self, direction):
+        return self.ledge_exists() and self.ledge == direction
+
+    def is_blocking_ledge(self, direction):
+        return self.ledge_exists() and self.ledge != direction

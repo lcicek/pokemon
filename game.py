@@ -49,16 +49,12 @@ while running:
             screen = get_scaled_screen(scale)
             unit_size = UNIT_SIZE * scale
 
-    # Check for more "events":
-
     # clear surface:
     screen.fill("black")
 
     handle_input(controller, player, location, move_lock)
     handle_render(screen, player, location, unit_size, move_lock=move_lock)
 
-    #renderGraphic(screen, location, player)
-    #renderPlayer(screen, player)
     # update display:
     pygame.display.flip()
     clock.tick(FPS)

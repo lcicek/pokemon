@@ -1,8 +1,8 @@
 from playerAnimation import PlayerAnimation
 from parameters import (
     LEFT, RIGHT, UP, DOWN, 
-    STANDING, WALKING,
-    WALK_CYCLE_FRAMES
+    STANDING, WALKING, JUMPING,
+    WALK_CYCLE_FRAMES, FRAMES_PER_JUMP_CYCLE_KEYFRAME
 )
 
 class Player:
@@ -16,7 +16,7 @@ class Player:
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
         self.move_state = (self.action, self.direction)
-        self.move_frame = 0 # 4 possible frames per move cycle
+        self.cycle_frame = 0 # 4 possible frames per move/jump cycle
 
         self.animation = PlayerAnimation()
 
@@ -29,6 +29,9 @@ class Player:
     def turns(self, new_direction):
         return self.direction != new_direction
 
+    def is_jumping(self):
+        return self.action == JUMPING
+
     def is_walking(self):
         return self.action == WALKING
 
@@ -39,29 +42,40 @@ class Player:
         return self.prev_x == self.x and self.prev_y == self.y
 
     def update_animation(self):
-        self.animation.update_active_frame(self.move_state, self.move_frame)
+        self.animation.update_active_frame(self.move_state, self.cycle_frame)
 
     def update_previous_position(self):
         self.prev_x = self.x
         self.prev_y = self.y
 
-    def update_position(self, direction):
-        self.next_move_frame()
-        self.update_previous_position()
-
+    def step(self, direction, step_size):
         if direction == UP:
-            self.y -= 1
+            self.y -= step_size
         elif direction == DOWN:
-            self.y += 1
+            self.y += step_size
         elif direction == LEFT:
-            self.x -= 1
+            self.x -= step_size
         elif direction == RIGHT:
-            self.x += 1
+            self.x += step_size
         else:
             raise RuntimeError("Invalid value for direction.")
 
+    def jump(self, direction):
+        self.update_previous_position()
+        self.step(direction, step_size=2)
+
+    def walk(self, direction):
+        self.next_move_frame()
+        self.update_previous_position()
+        self.step(direction, step_size=1)
+
+    def update_jump_frame(self, frames):
+        if frames % FRAMES_PER_JUMP_CYCLE_KEYFRAME == 0:
+            self.cycle_frame += 1
+            self.update_animation()
+
     def next_move_frame(self):
-        self.move_frame = (self.move_frame + 1) % WALK_CYCLE_FRAMES
+        self.cycle_frame = (self.cycle_frame + 1) % WALK_CYCLE_FRAMES
 
     def update_move_state(self):
         self.move_state = (self.action, self.direction)
@@ -71,7 +85,9 @@ class Player:
             return
 
         if action == WALKING:
-            self.move_frame = 0 if self.move_frame >= 2 else 2 # set correct spot in walk cycle
+            self.cycle_frame = 0 if self.cycle_frame >= 2 else 2 # set correct spot in walk cycle
+        elif action == JUMPING:
+            self.cycle_frame = 0
 
         self.action = action
         self.update_move_state()
@@ -82,32 +98,3 @@ class Player:
 
     def is_at_edge(self, location):
         return self.x == 0 or self.y == 0 or self.x == location.width-1 or self.y == location.height-1
-
-    def next_coordinates(self, direction):
-        next_x = self.x
-        next_y = self.y
-
-        if direction == LEFT:
-            next_x -= 1
-        elif direction == RIGHT:
-            next_x += 1
-        elif direction == UP:
-            next_y -= 1
-        else:
-            next_y += 1
-
-        return next_x, next_y
-
-
-    def next_step_is_valid(self, location, direction):
-        next_x, next_y = self.next_coordinates(direction)
-        next_square = location.map[next_y][next_x]
-        next_blocks = next_square.is_solid() or (next_square.is_ledge() and next_square.ledge_blocks(direction))
-        
-        return not (next_blocks or self.next_is_out_of_bounds(next_x, next_y, location))
-
-    def next_is_out_of_bounds(self, next_x, next_y, location):
-        return not self.next_is_in_bounds(next_x, next_y, location)
-
-    def next_is_in_bounds(self, next_x, next_y, location):
-        return next_x >= 0 and next_y >= 0 and next_x < location.width and next_y < location.height
