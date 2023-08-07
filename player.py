@@ -101,9 +101,10 @@ class Player:
 
     def next_step_is_valid(self, location, direction):
         next_x, next_y = self.next_coordinates(direction)
-        next_is_solid = location.map[next_y][next_x].is_solid() # y = row, x = col 
-
-        return not (next_is_solid or self.next_is_out_of_bounds(next_x, next_y, location))
+        next_square = location.map[next_y][next_x]
+        next_blocks = next_square.is_solid() or (next_square.is_ledge() and next_square.ledge_blocks(direction))
+        
+        return not (next_blocks or self.next_is_out_of_bounds(next_x, next_y, location))
 
     def next_is_out_of_bounds(self, next_x, next_y, location):
         return not self.next_is_in_bounds(next_x, next_y, location)

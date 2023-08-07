@@ -17,3 +17,6 @@ class Square:
 
     def is_ledge(self):
         return self.ledge is not None
+    
+    def ledge_blocks(self, direction):
+        return self.ledge != direction
