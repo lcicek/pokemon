@@ -1,5 +1,6 @@
 from pygame import display, RESIZABLE
 from pygame import time
+from psutil import cpu_percent
 from parameters import VIEWPORT_WIDTH, VIEWPORT_HEIGHT, MAX_SCALE, TIME_PER_FRAME_MS
 
 def scale_graphics(location, player, scale):
@@ -18,4 +19,4 @@ def calculate_scale(rescaled_width):
     return scale
 
 def log_time(start_time):
-    print(f"Time: (target={TIME_PER_FRAME_MS}ms, actual={(time.get_ticks() - start_time)}ms)")
+    print(f"Time: (target={TIME_PER_FRAME_MS}ms, actual={(time.get_ticks() - start_time)}ms). CPU: {cpu_percent()}%")

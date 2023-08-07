@@ -33,7 +33,7 @@ move_lock = Lock()
 
 ### LOG ###
 frames = 0
-log_frame = FPS * 10
+log_frame = FPS * 2
 
 while running:
     start_time = pygame.time.get_ticks()
