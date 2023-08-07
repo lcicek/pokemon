@@ -1,6 +1,5 @@
 # Example file showing a basic pygame "game loop"
 import pygame
-from pygame import display, RESIZABLE
 import os
 
 from lock import Lock
@@ -21,6 +20,7 @@ pygame.init()
 screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
+unit_size = UNIT_SIZE * DEFAULT_SCALE
 
 # SETUP SPRITES:
 player = Player()
@@ -31,16 +31,23 @@ controller = Controller()
 ### INIT LOCKS ###
 move_lock = Lock()
 
+### LOG ###
+frames = 0
+log_frame = FPS * 10
+
 while running:
+    start_time = pygame.time.get_ticks()
+    frames += 1
+
     # poll for pygame events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        #elif event.type == pygame.VIDEORESIZE:
-        #    scale = calculateScale(screen.get_width()) # screen.get_width() = event.dict['size][0]
-        #    player.graphic.updateScale(scale)
-        #    location.updateScale(scale)
-        #    screen = display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
+        elif event.type == pygame.VIDEORESIZE:
+            scale = calculate_scale(screen.get_width())
+            scale_graphics(location, player, scale)
+            screen = get_scaled_screen(scale)
+            unit_size = UNIT_SIZE * scale
 
     # Check for more "events":
 
@@ -48,12 +55,16 @@ while running:
     screen.fill("black")
 
     handle_input(controller, player, location, move_lock)
-    handle_render(screen, player, location, move_lock=move_lock)
+    handle_render(screen, player, location, unit_size, move_lock=move_lock)
 
     #renderGraphic(screen, location, player)
     #renderPlayer(screen, player)
     # update display:
     pygame.display.flip()
     clock.tick(FPS)
+
+    if frames == log_frame:
+        log_time(start_time)
+        frames = 0
 
 pygame.quit()

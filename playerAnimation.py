@@ -4,7 +4,7 @@ from parameters import (
     WALKING_FRONT, WALKING_BACK, WALKING_LEFT, WALKING_RIGHT,
     WALKING_FRONT_2, WALKING_BACK_2, WALKING_LEFT_2, WALKING_RIGHT_2,
     LEFT, RIGHT, UP, DOWN,
-    STANDING, WALKING, SPRINTING
+    STANDING, WALKING
 )
 
 class PlayerAnimation:
@@ -44,6 +44,19 @@ class PlayerAnimation:
             self.active_frame = self.get_walking_frame(move_state=move_state, move_frame=move_frame)
         else:
             raise RuntimeError("Found invalid state while trying to find current player frame.")
+
+    def rescale_stand_frames(self, scale):
+        for _, frame in self.frames[0].items():
+            frame.rescale(scale)
+
+    def rescale_walk_frames(self, scale):
+        for _, frames in self.frames[1].items():
+            for frame in frames:
+                frame.rescale(scale)
+
+    def rescale(self, scale):
+        self.rescale_stand_frames(scale)
+        self.rescale_walk_frames(scale)
 
     def get_standing_frame(self, move_state):
         return self.frames[0][move_state].scaled_image
