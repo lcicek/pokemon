@@ -1,24 +1,29 @@
 from parameters import (
-    WALKING, STANDING, JUMPING,
+    WALKING, STANDING, JUMPING, SPRINTING,
     LEFT, RIGHT, UP
 )
 
 def handle_input(controller, player, location, move_lock):
-    input_direction = controller.listen()
+    controller.listen()
 
     if move_lock.is_unlocked():
-        executed_move = execute_movement(input_direction, player, location)
+        direction = controller.active_movement_key
+        sprinting = controller.b
+        executed_move = execute_movement(direction, player, location, sprinting=sprinting)
         
         if executed_move:
-            move_lock.lock()
+            move_lock.lock(player)
     else:
-        move_lock.try_unlock(player)
+        unlocked = move_lock.try_unlock()
 
-def execute_movement(input_direction, player, location):
+        if not unlocked and player.is_jumping():
+            player.animation.next_keyframe(move_lock.frame_count(), player.get_move_state())
+
+def execute_movement(input_direction, player, location, sprinting=False):
     if input_direction is None and player.is_standing(): # player stands and there is no new input:
         return False
 
-    player_stopped_moving = input_direction is None and (player.is_walking() or player.is_jumping())
+    player_stopped_moving = input_direction is None and (player.is_walking() or player.is_jumping() or player.is_sprinting())
     direction_is_new = player.direction != input_direction
 
     if player_stopped_moving:
@@ -29,39 +34,33 @@ def execute_movement(input_direction, player, location):
         turn(player, input_direction)
     elif next_square_is_jumpable(player, location, input_direction):
         jump(player, input_direction)
-    elif next_square_is_walkable(player, location, input_direction):
+    elif next_square_is_walkable(player, location, input_direction) and sprinting:
+        sprint(player, input_direction)
+    elif next_square_is_walkable(player, location, input_direction) and not sprinting:
         walk(player, input_direction)
     else:
-        bump(player, input_direction)
+        bump(player, input_direction, action=SPRINTING if sprinting else WALKING)
     
     return True
 
 def stop(player):
-    player.update_action(STANDING)
-    player.update_animation()
+    player.update(action=STANDING)
 
 def turn(player, direction):
-    player.update_direction(direction)
-    player.update_animation()
+    player.update(direction=direction)
 
-def bump(player, direction):
-    player.update_action(WALKING)
-    player.update_direction(direction)
-    player.update_animation()
-    player.update_previous_position()
-    player.next_move_frame()
+def bump(player, direction, action):
+    player.update(action=action, direction=direction)
+    player.update_previous_position() # when bumping: previous position = current position
     
 def jump(player, direction):
-    player.update_action(JUMPING)
-    player.update_direction(direction)
-    player.update_animation()
-    player.jump(direction)
+    player.update(action=JUMPING, direction=direction, move=True)
 
 def walk(player, direction):
-    player.update_action(WALKING)
-    player.update_direction(direction)
-    player.update_animation()
-    player.walk(direction)
+    player.update(action=WALKING, direction=direction, move=True)
+
+def sprint(player, direction):
+    player.update(action=SPRINTING, direction=direction, move=True)
 
 def next_coordinates(player, direction):
         next_x = player.x

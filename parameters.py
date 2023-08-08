@@ -27,23 +27,30 @@ FPS = 60
 TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
 
 FRAMES_PER_STANDING_TURN = 8
+FRAMES_PER_SPRINT = 6
+FRAMES_PER_WALK = 14
+FRAMES_PER_JUMP = 24
 
-FRAMES_PER_WALK = 15
 WALK_CYCLE_FRAMES = 4
-
-FRAMES_PER_JUMP = 30
 JUMP_CYCLE_KEYFRAMES = 3
-FRAMES_PER_JUMP_CYCLE_KEYFRAME = FRAMES_PER_JUMP / JUMP_CYCLE_KEYFRAMES
+SPRINT_CYCLE_KEYFRAMES = 3
 
-### DIRECTION ###
+FRAMES_PER_JUMP_CYCLE_KEYFRAME = FRAMES_PER_JUMP // JUMP_CYCLE_KEYFRAMES
+FRAMES_PER_SPRINT_CYCLE_KEYFRAME = FRAMES_PER_SPRINT // SPRINT_CYCLE_KEYFRAMES
+
+### INPUT KEYS ###
 LEFT = 'a'
 RIGHT = 'd'
 UP = 'w'
 DOWN = 's'
 
+A = 'o'
+B = 'k'
+
 ### ACTION ###
 STANDING = "standing"
 WALKING = "walking"
+SPRINTING = "sprinting"
 JUMPING = "jumping"
 
 ### TILED ###
@@ -52,40 +59,3 @@ TILED_MAP_PATH = "tiles/maps/map_logic.tmx"
 ### LOCATION SPRITES ###
 LOCATION_SPRITE = "tiles/render-images/map.png"
 LOCATION_FOREGROUND = "tiles/render-images/map_foreground.png"
-
-### PLAYER SPRITES FOR ANIMATION ###
-# STANDING
-STANDING_FRONT = "sprites/player/standing-front.png"
-STANDING_BACK = "sprites/player/standing-back.png"
-STANDING_LEFT = "sprites/player/standing-left.png"
-STANDING_RIGHT = "sprites/player/standing-right.png"
-
-# WALKING
-WALKING_FRONT = "sprites/player/walk-down/walking-front.png"
-WALKING_FRONT_2 = "sprites/player/walk-down/walking-front2.png"
-
-WALKING_BACK = "sprites/player/walk-up/walking-back.png"
-WALKING_BACK_2 = "sprites/player/walk-up/walking-back2.png"
-
-WALKING_LEFT = "sprites/player/walk-left/walking-left.png"
-WALKING_LEFT_2 = "sprites/player/walk-left/walking-left2.png"
-
-WALKING_RIGHT = "sprites/player/walk-right/walking-right.png"
-WALKING_RIGHT_2 = "sprites/player/walk-right/walking-right2.png"
-
-# JUMPING
-JUMPING_UP_1 = "sprites\player\jump-up\jumping-up1.png"
-JUMPING_UP_2 = "sprites\player\jump-up\jumping-up2.png"
-JUMPING_UP_3 = "sprites\player\jump-up\jumping-up3.png"
-
-JUMPING_DOWN_1 = "sprites\player\jump-down\jumping-down1.png"
-JUMPING_DOWN_2 = "sprites\player\jump-down\jumping-down2.png"
-JUMPING_DOWN_3 = "sprites\player\jump-down\jumping-down3.png"
-
-JUMPING_LEFT_1 = "sprites\player\jump-left\jumping-left1.png"
-JUMPING_LEFT_2 = "sprites\player\jump-left\jumping-left2.png"
-JUMPING_LEFT_3 = "sprites\player\jump-left\jumping-left3.png"
-
-JUMPING_RIGHT_1 = "sprites\player\jump-right\jumping-right1.png"
-JUMPING_RIGHT_2 = "sprites\player\jump-right\jumping-right2.png"
-JUMPING_RIGHT_3 = "sprites\player\jump-right\jumping-right3.png"

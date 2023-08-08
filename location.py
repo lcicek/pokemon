@@ -27,7 +27,7 @@ class Location:
     def init_map(self):
         tree = ET.parse(TILED_MAP_PATH)
         root = tree.getroot()
-        map = root[1][0].text
+        map = root[1][0].text # change
         map = map.split()
         
         for i, row in enumerate(map):

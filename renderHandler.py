@@ -1,6 +1,6 @@
 from parameters import (
     X_HALF, Y_HALF, CENTER_X_RATIO, CENTER_Y_RATIO,
-    FRAMES_PER_WALK, FRAMES_PER_JUMP
+    FRAMES_PER_WALK, FRAMES_PER_JUMP, FRAMES_PER_SPRINT
 )
 
 def handle_render(screen, player, location, unit_size, move_lock):
@@ -25,17 +25,23 @@ def calculate_location_position(player, scale, move_lock):
         x, y = target_render_position(player, scale)
     else:
         delta_x, delta_y = player.get_previous_delta()
-        num_frames = FRAMES_PER_WALK if player.is_walking() else FRAMES_PER_JUMP
+
+        num_frames = get_num_frames(player)
         current_step = move_lock.frame_count()
-        
-        if player.is_jumping():
-            player.update_jump_frame(current_step)
 
         x = intermediate_position(player.prev_x, current_step, delta_x, num_frames)
         y = intermediate_position(player.prev_y, current_step, delta_y, num_frames)
         x, y = position_to_render_position(x, y, scale)
 
     return x, y
+
+def get_num_frames(player):
+    if player.is_walking():
+        return FRAMES_PER_WALK
+    elif player.is_sprinting():
+        return FRAMES_PER_SPRINT
+    else:
+        return FRAMES_PER_JUMP
 
 def target_render_position(player, unit_size):
     target_x = (-player.x + X_HALF) * unit_size
