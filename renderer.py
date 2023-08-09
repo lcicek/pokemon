@@ -1,6 +1,6 @@
 import pygame
 
-from parameters import (
+from constant.parameters import (
     DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT,
     X_HALF, Y_HALF, CENTER_X_RATIO, CENTER_Y_RATIO,
     UNIT_SIZE, DEFAULT_SCALE
@@ -19,6 +19,8 @@ class Renderer:
         self.renderGraphic(location.graphic, x, y)
         self.renderPlayer(animator)
         self.renderGraphic(location.foreground_graphic, x, y)
+
+        pygame.display.flip()
 
     def renderPlayer(self, animator): # render player at center 
             render_x = self.screen.get_width() * CENTER_X_RATIO

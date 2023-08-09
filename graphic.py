@@ -1,5 +1,5 @@
 from pygame import image, transform
-from parameters import (
+from constant.parameters import (
     DEFAULT_SCALE, UNIT_SIZE
 )
 

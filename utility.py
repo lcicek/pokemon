@@ -2,7 +2,7 @@ from pygame import time
 import psutil
 import os
 from psutil import cpu_percent, virtual_memory
-from parameters import VIEWPORT_WIDTH, MIN_SCALE, MAX_SCALE, TIME_PER_FRAME_MS
+from constant.parameters import VIEWPORT_WIDTH, MIN_SCALE, MAX_SCALE, TIME_PER_FRAME_MS
 
 def scale_location(location, scale):
     location.graphic.rescale(scale)

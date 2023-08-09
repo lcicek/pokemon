@@ -1,4 +1,4 @@
-from parameters import (
+from constant.parameters import (
     LEFT, RIGHT, UP, DOWN, 
     STANDING, WALKING, SPRINTING, JUMPING
 )

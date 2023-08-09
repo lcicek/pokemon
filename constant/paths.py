@@ -1,3 +1,12 @@
+### TILED ###
+MAP_CSV_PATH = "tiles/maps/map_logic.csv"
+MAP_XML_PATH = "tiles/maps/map_logic.xml"
+
+### LOCATION SPRITES ###
+LOCATION_SPRITE = "tiles/render-images/map.png"
+LOCATION_FOREGROUND = "tiles/render-images/map_foreground.png"
+
+### ANIMATION ###
 # STANDING
 STANDING_FRONT = "sprites/player/standing-front.png"
 STANDING_BACK = "sprites/player/standing-back.png"

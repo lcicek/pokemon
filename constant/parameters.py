@@ -1,3 +1,18 @@
+### INPUT KEYS ###
+LEFT = 'a'
+RIGHT = 'd'
+UP = 'w'
+DOWN = 's'
+
+A = 'o'
+B = 'k'
+
+### ACTION ###
+STANDING = "standing"
+WALKING = "walking"
+SPRINTING = "sprinting"
+JUMPING = "jumping"
+
 ### WINDOW ###
 WINDOW_SPAWN = "5, 35"
 WINDOW_CAPTION = "Pokemon"
@@ -30,32 +45,14 @@ FPS = 60
 TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
 
 FRAMES_PER_TURN = 8
-FRAMES_PER_SPRINT = 6
+FRAMES_PER_SPRINT = 8
 FRAMES_PER_WALK = 16
 FRAMES_PER_JUMP = 24
 
 WALK_CYCLE_LENGTH = 4
 JUMP_CYCLE_LENGTH = 3
-SPRINT_CYCLE_LENGTH = 3
+SPRINT_CYCLE_LENGTH = 4
 
-### INPUT KEYS ###
-LEFT = 'a'
-RIGHT = 'd'
-UP = 'w'
-DOWN = 's'
-
-A = 'o'
-B = 'k'
-
-### ACTION ###
-STANDING = "standing"
-WALKING = "walking"
-SPRINTING = "sprinting"
-JUMPING = "jumping"
-
-### TILED ###
-TILED_MAP_PATH = "tiles/maps/map_logic.tmx"
-
-### LOCATION SPRITES ###
-LOCATION_SPRITE = "tiles/render-images/map.png"
-LOCATION_FOREGROUND = "tiles/render-images/map_foreground.png"
+assert FRAMES_PER_SPRINT % SPRINT_CYCLE_LENGTH == 0
+assert FRAMES_PER_WALK % WALK_CYCLE_LENGTH == 0
+assert FRAMES_PER_JUMP % JUMP_CYCLE_LENGTH == 0

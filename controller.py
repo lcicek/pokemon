@@ -1,7 +1,7 @@
 import keyboard
 from ordered_set import OrderedSet
 
-from parameters import (
+from constant.parameters import (
     LEFT, RIGHT, UP, DOWN, A, B
 )
 

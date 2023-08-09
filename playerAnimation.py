@@ -1,6 +1,6 @@
 from graphic import Graphic
-from animationPaths import *
-from parameters import (
+from constant.paths import *
+from constant.parameters import (
     LEFT, RIGHT, UP, DOWN,
     STANDING, WALKING, JUMPING, SPRINTING,
     JUMP_CYCLE_LENGTH,

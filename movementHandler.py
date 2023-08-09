@@ -1,4 +1,4 @@
-from parameters import (
+from constant.parameters import (
     WALKING, STANDING, JUMPING, SPRINTING,
     LEFT, RIGHT, UP,
     FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP
