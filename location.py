@@ -15,8 +15,8 @@ class Location:
         self.graphic = Graphic(graphic)
         self.foreground_graphic = Graphic(foreground_graphic)
 
-        self.width = self.graphic.image.get_width() // UNIT_SIZE # width in tiles
-        self.height = self.graphic.image.get_height() // UNIT_SIZE # height in tiles
+        self.width = self.graphic.width # width in tiles
+        self.height = self.graphic.height # height in tiles
 
     def square_is_solid(self, col, row, direction):
         return self.map[col][row].is_solid() or self.map[col][row].is_blocking_ledge(direction)

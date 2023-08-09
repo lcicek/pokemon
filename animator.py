@@ -34,7 +34,7 @@ class Animator:
             self.active_player_animation.update_frame_number(player.continuous_steps)
 
     def rescale(self, scale):
-        for _, animation in self.move_animations.items():
+        for _, animation in self.player_animations.items():
             animation.rescale_frames(scale)
 
     def init_player_frames(self):

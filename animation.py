@@ -23,8 +23,9 @@ class Animation:
         self.frame_number = (self.frame_number + 1) % self.length
 
     def rescale_frames(self, scale):
-        for _, frame in self.frames.items():
-            frame.rescale(scale)
+        for _, cycle in self.frames.items():
+            for frame in cycle:
+                frame.rescale(scale)
     
 class WalkAnimation(Animation):
     def __init__(self, frames, length, duration) -> None:

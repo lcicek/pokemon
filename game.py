@@ -1,6 +1,6 @@
 # Example file showing a basic pygame "game loop"
-import pygame
 import os
+import pygame
 
 from lock import MovementLock
 from animator import Animator
@@ -17,6 +17,7 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN
 
 # SETUP PYGAME:
 pygame.init()
+pygame.display.set_caption(WINDOW_CAPTION)
 clock = pygame.time.Clock()
 running = True
 
@@ -45,7 +46,8 @@ while running:
             running = False
         elif event.type == pygame.VIDEORESIZE:
             scale = calculate_scale(renderer.screen.get_width())
-            scale_location(location, player, scale)
+            animator.rescale(scale)
+            scale_location(location, scale)
             renderer.rescale(scale)
 
     handle_input(controller, player, location, move_lock)
@@ -57,7 +59,7 @@ while running:
     clock.tick(FPS)
 
     if frames == log_frame:
-        log_time(start_time)
+        log(start_time)
         frames = 0
 
 pygame.quit()
