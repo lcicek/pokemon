@@ -3,8 +3,8 @@ from animationPaths import *
 from parameters import (
     LEFT, RIGHT, UP, DOWN,
     STANDING, WALKING, JUMPING, SPRINTING,
-    FRAMES_PER_JUMP_CYCLE_KEYFRAME, FRAMES_PER_SPRINT_CYCLE_KEYFRAME,
-    WALK_CYCLE_FRAMES, SPRINT_CYCLE_KEYFRAMES
+    JUMP_CYCLE_LENGTH,
+    WALK_CYCLE_LENGTH, SPRINT_CYCLE_LENGTH
 )
 
 class PlayerAnimation:
@@ -12,7 +12,6 @@ class PlayerAnimation:
         self.frames = []
         self.active_frame = None
         self.keyframe = 0
-        self.frames_per_keyframe = None
 
         self.initialize_frames()
         self.initialize_active_frame()
@@ -20,12 +19,10 @@ class PlayerAnimation:
     def initialize_active_frame(self):
         self.active_frame = self.frames[0][(STANDING, DOWN)].scaled_image
 
-    def update_active_frame(self, move_state):
+    def set_active_frame(self, move_state):
         if move_state in self.frames[0]:
             self.active_frame = self.get_standing_frame(move_state)
             return
-
-        self.set_frames_per_keyframe(move_state[0])
 
         if move_state in self.frames[1]:
             self.active_frame = self.get_move_frame(move_state, 1)
@@ -38,19 +35,6 @@ class PlayerAnimation:
         else:
             raise RuntimeError(f"Found invalid state {move_state} while trying to find current player frame.")
 
-    def rescale_stand_frames(self, scale):
-        for _, frame in self.frames[0].items():
-            frame.rescale(scale)
-
-    def rescale_walk_frames(self, scale):
-        for _, frames in self.frames[1].items():
-            for frame in frames:
-                frame.rescale(scale)
-
-    def rescale(self, scale):
-        self.rescale_stand_frames(scale)
-        self.rescale_walk_frames(scale)
-
     def get_standing_frame(self, move_state):
         return self.frames[0][move_state].scaled_image
     
@@ -59,30 +43,15 @@ class PlayerAnimation:
         frame = move_frames[self.keyframe]
 
         return frame.scaled_image
-    
-    def get_state_index(self, state):
-        if state[0] == STANDING:
-            return 0
-        elif state[0] == WALKING:
-            return 1
-        elif state[0] == SPRINTING:
-            return 2
-        else:
-            return 3 
 
-    def next_keyframe(self, frames, move_state):
-        keyframe = (frames-1) // self.frames_per_keyframe
-
-        if keyframe > self.keyframe:
-            self.keyframe = keyframe
-            state_index = self.get_state_index(move_state)
-            self.active_frame = self.get_move_frame(move_state, state_index)
+    def next_jump_frame(self):
+        self.keyframe = (self.keyframe + 1) % JUMP_CYCLE_LENGTH
 
     def next_walk_frame(self):
-        self.keyframe = (self.keyframe + 1) % WALK_CYCLE_FRAMES
+        self.keyframe = (self.keyframe + 1) % WALK_CYCLE_LENGTH
 
     def next_sprint_frame(self):
-        self.keyframe = (self.keyframe + 1) % SPRINT_CYCLE_KEYFRAMES
+        self.keyframe = (self.keyframe + 1) % SPRINT_CYCLE_LENGTH
 
     def reset_walk_cycle(self):
         self.keyframe = 0 if self.keyframe >= 2 else 2 # set correct spot in walk cycle
@@ -96,14 +65,19 @@ class PlayerAnimation:
         elif action == JUMPING:
             self.keyframe = 0
     
-    def set_frames_per_keyframe(self, action):
-        if action == JUMPING:
-            self.frames_per_keyframe = FRAMES_PER_JUMP_CYCLE_KEYFRAME
-        elif action == SPRINTING:
-            self.frames_per_keyframe = FRAMES_PER_SPRINT_CYCLE_KEYFRAME
-        else:
-            self.frames_per_keyframe = None
-    
+    def rescale_stand_frames(self, scale):
+        for _, frame in self.frames[0].items():
+            frame.rescale(scale)
+
+    def rescale_walk_frames(self, scale):
+        for _, frames in self.frames[1].items():
+            for frame in frames:
+                frame.rescale(scale)
+
+    def rescale(self, scale):
+        self.rescale_stand_frames(scale)
+        self.rescale_walk_frames(scale)
+
     def initialize_frames(self):
         standing_frames = {
             (STANDING, DOWN): Graphic(STANDING_FRONT),
@@ -125,7 +99,6 @@ class PlayerAnimation:
             (JUMPING, LEFT): [Graphic(JUMPING_LEFT_1), Graphic(JUMPING_LEFT_2), Graphic(JUMPING_LEFT_3)],
             (JUMPING, RIGHT): [Graphic(JUMPING_RIGHT_1), Graphic(JUMPING_RIGHT_2), Graphic(JUMPING_RIGHT_3)]
         }
-
         
         sprint_cycle_frames = {
             (SPRINTING, DOWN): [Graphic(SPRINTING_DOWN_1), Graphic(SPRINTING_DOWN_2), Graphic(SPRINTING_DOWN_3), Graphic(SPRINTING_DOWN_2)],
@@ -133,7 +106,6 @@ class PlayerAnimation:
             (SPRINTING, LEFT): [Graphic(SPRINTING_LEFT_1), Graphic(SPRINTING_LEFT_2), Graphic(SPRINTING_LEFT_3), Graphic(SPRINTING_LEFT_2)],
             (SPRINTING, RIGHT): [Graphic(SPRINTING_RIGHT_1), Graphic(SPRINTING_RIGHT_2), Graphic(SPRINTING_RIGHT_3), Graphic(SPRINTING_RIGHT_2)]
         }
-        
 
         frames = []
         frames.extend([standing_frames, walk_cycle_frames, sprint_cycle_frames, jump_cycle_frames])

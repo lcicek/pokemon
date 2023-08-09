@@ -1,4 +1,3 @@
-from playerAnimation import PlayerAnimation
 from parameters import (
     LEFT, RIGHT, UP, DOWN, 
     STANDING, WALKING, SPRINTING, JUMPING
@@ -14,8 +13,8 @@ class Player:
 
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
-
-        self.animation = PlayerAnimation()
+        
+        self.continuous_steps = 0 # to track continuous walk/sprint steps
 
     def get_previous_delta(self):
         delta_x = self.x - self.prev_x
@@ -47,23 +46,30 @@ class Player:
         elif self.action == WALKING or self.action == SPRINTING:
             self.step(step_size=1)
 
-    def update_animation(self):
-        move_state = (self.action, self.direction)
-        self.animation.update_active_frame(move_state)
+    def update_step_number(self, state_changed):
+        if self.action == WALKING or self.action == SPRINTING:
+            if state_changed:
+                self.continuous_steps = 0
+            else:
+                self.continuous_steps += 1
 
     def update_state(self, action, direction):
-        if action is not None and self.action != action:
+        if self.action == action and self.direction == direction:
+            return False
+
+        if action is not None:
             self.action = action
-            self.animation.reset_keyframe(action)
         
         if direction is not None:
             self.direction = direction
+        
+        return True
 
     def update(self, action=None, direction=None, move=False):
         assert action is not None or direction is not None
-        
-        self.update_state(action, direction)
-        self.update_animation()
+
+        state_changed = self.update_state(action, direction)
+        self.update_step_number(state_changed)
 
         if move:
             self.update_position()

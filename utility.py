@@ -1,17 +1,10 @@
-from pygame import display, RESIZABLE
 from pygame import time
 from psutil import cpu_percent
-from parameters import VIEWPORT_WIDTH, VIEWPORT_HEIGHT, MAX_SCALE, TIME_PER_FRAME_MS
+from parameters import VIEWPORT_WIDTH, MAX_SCALE, TIME_PER_FRAME_MS
 
-def scale_graphics(location, player, scale):
-    player.animation.rescale(scale)
-    player.update_animation()
-
+def scale_location(location, scale):
     location.graphic.rescale(scale)
     location.foreground_graphic.rescale(scale)
-    
-def get_scaled_screen(scale):
-    return display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), RESIZABLE)
 
 def calculate_scale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH

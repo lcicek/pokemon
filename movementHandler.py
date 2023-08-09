@@ -1,47 +1,48 @@
 from parameters import (
     WALKING, STANDING, JUMPING, SPRINTING,
-    LEFT, RIGHT, UP
+    LEFT, RIGHT, UP,
+    FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP
 )
 
 def handle_input(controller, player, location, move_lock):
     controller.listen()
+    move_lock.update()
 
     if move_lock.is_unlocked():
         direction = controller.active_movement_key
         sprinting = controller.b
-        executed_move = execute_movement(direction, player, location, sprinting=sprinting)
+        movement_duration = execute_movement(direction, player, location, sprinting=sprinting)
         
-        if executed_move:
-            move_lock.lock(player)
-    else:
-        unlocked = move_lock.try_unlock()
-
-        if not unlocked and player.is_jumping():
-            player.animation.next_keyframe(move_lock.frame_count(), player.get_move_state())
+        if movement_duration > 0:
+            move_lock.lock(movement_duration)
 
 def execute_movement(input_direction, player, location, sprinting=False):
     if input_direction is None and player.is_standing(): # player stands and there is no new input:
-        return False
+        return 0
 
     player_stopped_moving = input_direction is None and (player.is_walking() or player.is_jumping() or player.is_sprinting())
     direction_is_new = player.direction != input_direction
 
     if player_stopped_moving:
         stop(player)
-        return False
+        return 0
     
     if direction_is_new and player.is_standing():
         turn(player, input_direction)
+        return FRAMES_PER_TURN
     elif next_square_is_jumpable(player, location, input_direction):
         jump(player, input_direction)
+        return FRAMES_PER_JUMP
     elif next_square_is_walkable(player, location, input_direction) and sprinting:
         sprint(player, input_direction)
+        return FRAMES_PER_SPRINT
     elif next_square_is_walkable(player, location, input_direction) and not sprinting:
         walk(player, input_direction)
+        return FRAMES_PER_WALK
     else:
-        bump(player, input_direction, action=SPRINTING if sprinting else WALKING)
-    
-    return True
+        action = SPRINTING if sprinting else WALKING
+        bump(player, input_direction, action=action)
+        return FRAMES_PER_SPRINT if action == SPRINTING else FRAMES_PER_WALK
 
 def stop(player):
     player.update(action=STANDING)
