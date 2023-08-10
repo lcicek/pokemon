@@ -9,6 +9,10 @@ B = 'k'
 
 START = 'i'
 
+### GAME STATES ###
+OUTSIDE = 0
+GAME_MENU = 1
+
 ### ACTION ###
 STANDING = "standing"
 WALKING = "walking"
@@ -47,7 +51,7 @@ FPS = 60
 TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
 
 ### TIME MENU ###
-FRAMES_PER_SELECT = 5
+FRAMES_PER_SELECT = 10
 
 ### TIME: MOVEMENT ###
 FRAMES_PER_TURN = 8

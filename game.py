@@ -21,10 +21,12 @@ pygame.display.set_caption(WINDOW_CAPTION)
 clock = pygame.time.Clock()
 running = True
 
+game_state = OUTSIDE
+
 player = Player()
 location = Location(LOCATION_SPRITE, LOCATION_FOREGROUND)
 
-controller = Controller()
+controller = Controller(game_state)
 animator = Animator()
 renderer = Renderer()
 
@@ -54,22 +56,25 @@ while running:
             renderer.rescale(scale)
             game_menu.rescale(scale)
 
-    controller.listen(outside_lock.is_unlocked())
+    controller.listen()
     
-    if move_lock.is_locked():
-        move_lock.update()
+    current_state = update_game_state(controller, move_lock, outside_lock, player, game_menu)
+    
+    if game_state != current_state:
+        game_state = current_state
+        controller.set_state(current_state)
 
-        if outside_lock.is_locked() and move_lock.is_unlocked(): # movement came to an end
-            movementHandler.stop(player)
-
-    handle_menu(controller, game_menu, outside_lock, arrow_lock)
-    movementHandler.handle_movement(controller, player, location, move_lock, outside_lock)
+    if game_state == OUTSIDE:
+        movementHandler.handle_movement(controller, player, location, move_lock, outside_lock)
+    elif game_state == GAME_MENU:
+        handle_menu_navigation(controller, game_menu, outside_lock, arrow_lock, move_lock, player)
+    
     animator.animate_player(player, move_lock)
     renderer.render(player, location, animator, move_lock, game_menu)
 
     clock.tick(FPS)
 
-    if False:
+    if frames == log_frame:
         log(start_time)
         frames = 0
 

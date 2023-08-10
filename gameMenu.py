@@ -26,9 +26,9 @@ class GameMenu:
             0: (self.x_offset, self.y_offset)
         } 
 
-    def select(self, outside_lock):
+    def select(self):
         if self.arrow_at_exit():
-            self.close_menu(outside_lock)
+            self.close_menu()
         else:
             print("Menu action isn't implemented yet.")
 
@@ -59,22 +59,18 @@ class GameMenu:
     def exit_layer(self):
         self.layer -= 1
 
-    def open_menu(self, outside_lock):
-        assert outside_lock.is_unlocked()
-
+    def open_menu(self):
         self.open = True
         self.layer = 0
-        outside_lock.lock()
 
-    def close_menu(self, outside_lock):
-        assert self.can_be_closed() and outside_lock.is_locked()
+    def close_menu(self):
+        assert self.can_be_closed()
 
         self.open = False
         self.layer = None
-        outside_lock.unlock()
 
     def can_be_closed(self):
-        return self.layer == 0
+        return self.is_open() and self.layer == 0
 
     def is_open(self):
         return self.open
@@ -85,3 +81,5 @@ class GameMenu:
     def rescale(self, scale):
         for key in self.display_box:
             self.display_box[key].rescale(scale)
+
+        self.arrow.rescale(scale)
