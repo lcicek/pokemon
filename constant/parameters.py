@@ -7,6 +7,8 @@ DOWN = 's'
 A = 'o'
 B = 'k'
 
+START = 'i'
+
 ### ACTION ###
 STANDING = "standing"
 WALKING = "walking"
@@ -44,6 +46,10 @@ DEFAULT_SCREEN_HEIGHT = VIEWPORT_HEIGHT * DEFAULT_SCALE
 FPS = 60
 TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
 
+### TIME MENU ###
+FRAMES_PER_SELECT = 5
+
+### TIME: MOVEMENT ###
 FRAMES_PER_TURN = 8
 FRAMES_PER_SPRINT = 8
 FRAMES_PER_WALK = 16

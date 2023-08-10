@@ -1,5 +1,5 @@
-from PIL import Image
-import argparse 
+from PIL import Image, ImageFont, ImageDraw
+import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('dimensions', type=int, nargs=2)
@@ -14,6 +14,7 @@ cyan = args.cyan
 BOTTOM_LEFT_CORNER_PATH = "sprites/displayBox/bottom-left-corner.png" if not cyan else "sprites/displayBox/bottom-left-corner-dialogue.png"
 BOTTOM_EDGE_PATH = "sprites/displayBox/bottom-edge.png" if not cyan else "sprites/displayBox/bottom-edge-dialogue.png"
 MIDDLE_PATH = "sprites/displayBox/middle.png"
+FONT_PATH = "sprites/displayBox/font.ttf"
 
 unit_size = 8
 
@@ -33,6 +34,9 @@ left_edge = bottom_edge.rotate(270)
 middle = Image.open(MIDDLE_PATH)
 
 image = Image.new(mode="RGBA", size=(w, h))
+font = ImageFont.truetype(font=FONT_PATH, size=8)
+draw = ImageDraw.Draw(im=image)
+
 for y in range(0, h, unit_size):
     for x in range(0, w, unit_size):
         if x == y and x == 0:
@@ -55,5 +59,15 @@ for y in range(0, h, unit_size):
             curr = middle
         
         image.paste(curr, box=(x, y))
+
+texts = ["POKEMON", "BAG", "SAVE", "OPTIONS", "EXIT"]
+i = 0
+for y in range(2*unit_size, h-unit_size, unit_size*3):
+    if i == len(texts):
+        break
+
+    draw.text(xy=(2*unit_size, y), text=texts[i], font=font, fill='#444444')
+    i += 1
+
 
 image.save(f"sprites/displayBox/generated/{name}.png")

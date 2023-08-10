@@ -1,14 +1,25 @@
-class MovementLock:
+class Lock:
     def __init__(self) -> None:
         self.locked = False
-        self.frames_since_start = None
-        self.lock_duration = None
-
+    
     def is_unlocked(self):
         return not self.locked
 
     def is_locked(self):
         return self.locked
+
+    def unlock(self):
+        self.locked = False
+
+    def lock(self):
+        self.locked = True
+
+class MovementLock(Lock):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.frames_since_start = None
+        self.lock_duration = None
 
     def lock(self, lock_duration):
         self.locked = True
@@ -16,9 +27,6 @@ class MovementLock:
         self.frames_since_start = 1
 
     def update(self):
-        if self.is_unlocked():
-            return
-
         self.frames_since_start += 1
 
         if self.frames_since_start > self.lock_duration:

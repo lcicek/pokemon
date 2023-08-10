@@ -11,7 +11,7 @@ class Renderer:
         self.screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
         self.unit_size = UNIT_SIZE * DEFAULT_SCALE
 
-    def render(self, player, location, animator, move_lock):
+    def render(self, player, location, animator, move_lock, game_menu):
         self.screen.fill("black")
 
         x, y = self.calculate_location_position(player, move_lock)
@@ -19,6 +19,9 @@ class Renderer:
         self.renderGraphic(location.graphic, x, y)
         self.renderPlayer(animator)
         self.renderGraphic(location.foreground_graphic, x, y)
+        
+        if game_menu.is_open() and move_lock.is_unlocked():
+            self.renderGameMenu(game_menu)
 
         pygame.display.flip()
 
@@ -30,6 +33,17 @@ class Renderer:
 
     def renderGraphic(self, graphic, x, y): 
         self.screen.blit(graphic.scaled_image, (x, y))
+
+    def renderGameMenu(self, game_menu):
+        x, y = game_menu.get_menu_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(game_menu.get_menu_graphic(), (x, y))
+
+        x, y = game_menu.get_arrow_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(game_menu.get_arrow_graphic(), (x, y))
 
     def calculate_location_position(self, player, move_lock):
         player_did_not_walk = move_lock.is_unlocked() or player.is_standing()

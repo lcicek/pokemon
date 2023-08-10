@@ -2,24 +2,22 @@ import keyboard
 from ordered_set import OrderedSet
 
 from constant.parameters import (
-    LEFT, RIGHT, UP, DOWN, A, B
+    LEFT, RIGHT, UP, DOWN, A, B, START
 )
 
 class Controller:
     def __init__(self) -> None:
-        self.movement_keys = OrderedSet()
-        
+        self.movement_keys = OrderedSet()        
         self.active_movement_key = None
 
-        self.a_was_pressed = False
-        self.b_was_pressed = False
+        self.action_keys = {A: False, B: False, START: False}
+        self.was_pressed = {A: False, B: False, START: False}
 
-        self.a = False
-        self.b = False
+        self.b_toggled = False
 
     # listen(): Listens for input and returns corresponding action.
-    def listen(self):
-        self.collect_input()
+    def listen(self, outside_is_locked):
+        self.collect_input(outside_is_locked)
         
         if len(self.movement_keys) == 0:
             self.active_movement_key = None
@@ -32,33 +30,30 @@ class Controller:
         else:
             return self.movement_keys[0]
 
-    def collect_input(self):
+    def collect_input(self, outside_is_unlocked):
         for key in [UP, DOWN, LEFT, RIGHT]:
             if keyboard.is_pressed(key):
                 self.movement_keys.add(key)
             else:
                 self.remove_movement_key(key)
 
-        self.collect_input_A()
-        self.collect_input_B()        
+        for key in self.action_keys:
+            self.collect_action_input(key, outside_is_unlocked)
 
-    def collect_input_A(self):
-        a_pressed = keyboard.is_pressed(A)
-        press_is_valid = not self.a_was_pressed and a_pressed
+    def collect_action_input(self, key, outside_is_unlocked):
+        pressed = keyboard.is_pressed(key)
+        press_is_valid = not self.was_pressed[key] and pressed
         
-        self.a = press_is_valid
-        self.a_was_pressed = a_pressed
+        if press_is_valid and key == B and outside_is_unlocked:
+            self.b_toggled = not self.b_toggled
 
-    def collect_input_B(self):
-        b_pressed = keyboard.is_pressed(B)
-        press_is_valid = not self.b_was_pressed and b_pressed
-        
-        if press_is_valid:
-            self.b = not self.b
-
-        self.b_was_pressed = b_pressed
+        self.action_keys[key] = press_is_valid # single press
+        self.was_pressed[key] = pressed
 
     def remove_movement_key(self, key):
         if key in self.movement_keys:
             self.movement_keys.remove(key)
+
+    def has_movement_input(self):
+        return self.active_movement_key is not None
         

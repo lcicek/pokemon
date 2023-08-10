@@ -25,6 +25,7 @@ class Animator:
         return self.active_player_animation.get_frame().scaled_image
 
     def animate_player(self, player, move_lock):
+        # consider checking if state changed and only then executing this block:
         self.active_player_animation = self.player_animations[player.action]
         self.active_player_animation.update_direction(player.direction)
 

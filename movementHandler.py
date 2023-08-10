@@ -1,16 +1,14 @@
 from constant.parameters import (
     WALKING, STANDING, JUMPING, SPRINTING,
     LEFT, RIGHT, UP,
-    FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP
+    FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP, 
+    B
 )
 
-def handle_input(controller, player, location, move_lock):
-    controller.listen()
-    move_lock.update()
-
-    if move_lock.is_unlocked():
+def handle_movement(controller, player, location, move_lock, outside_lock):
+    if outside_lock.is_unlocked() and move_lock.is_unlocked():
         direction = controller.active_movement_key
-        sprinting = controller.b
+        sprinting = controller.b_toggled
         movement_duration = execute_movement(direction, player, location, sprinting=sprinting)
         
         if movement_duration > 0:
