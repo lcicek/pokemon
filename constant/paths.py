@@ -6,9 +6,11 @@ MAP_XML_PATH = "tiles/maps/map_logic.xml"
 LOCATION_SPRITE = "tiles/render-images/map.png"
 LOCATION_FOREGROUND = "tiles/render-images/map_foreground.png"
 
-### DISPLAY BOXES ###
+### INFO BOXES ###
 GAME_MENU_PATH = "sprites/displayBox/generated/game_menu.png"
-ARROW_PATH = "sprites/displayBox/arrow-right.png"
+ARROW_RIGHT_PATH = "sprites/displayBox/arrow-right.png"
+ARROW_DOWN_PATH = "sprites/displayBox/arrow-down.png"
+DIALOGUE_BOX_PATH = "sprites/displayBox/generated/dialogue.png"
 
 ### TEXT FONT ###
 TEXT_FONT = "sprites/displayBox/font.ttf"

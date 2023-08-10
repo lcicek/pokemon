@@ -3,7 +3,8 @@ import pygame
 from constant.parameters import (
     DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, VIEWPORT_WIDTH, VIEWPORT_HEIGHT,
     X_HALF, Y_HALF, CENTER_X_RATIO, CENTER_Y_RATIO,
-    UNIT_SIZE, DEFAULT_SCALE
+    UNIT_SIZE, DEFAULT_SCALE,
+    GAME_MENU, DIALOGUE
 )
 
 class Renderer:
@@ -11,7 +12,7 @@ class Renderer:
         self.screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
         self.unit_size = UNIT_SIZE * DEFAULT_SCALE
 
-    def render(self, player, location, animator, move_lock, game_menu):
+    def render(self, player, location, animator, move_lock, game_state, game_menu, dialogue_box):
         self.screen.fill("black")
 
         x, y = self.calculate_location_position(player, move_lock)
@@ -20,8 +21,10 @@ class Renderer:
         self.renderPlayer(animator)
         self.renderGraphic(location.foreground_graphic, x, y)
         
-        if game_menu.is_open() and move_lock.is_unlocked():
+        if game_state == GAME_MENU:
             self.renderGameMenu(game_menu)
+        elif game_state == DIALOGUE:
+            self.renderDialogueBox(dialogue_box)
 
         pygame.display.flip()
 
@@ -34,11 +37,22 @@ class Renderer:
     def renderGraphic(self, graphic, x, y): 
         self.screen.blit(graphic.scaled_image, (x, y))
 
-    def renderGameMenu(self, game_menu):
-        x, y = game_menu.get_menu_position()
+    def renderDialogueBox(self, dialogue_box):
+        x, y = dialogue_box.get_position()
         x *= self.unit_size
         y *= self.unit_size
-        self.screen.blit(game_menu.get_menu_graphic(), (x, y))
+        self.screen.blit(dialogue_box.get_graphic(), (x, y))
+
+        x, y = dialogue_box.get_arrow_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(dialogue_box.get_arrow_graphic(), (x, y))
+
+    def renderGameMenu(self, game_menu):
+        x, y = game_menu.get_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(game_menu.get_graphic(), (x, y))
 
         x, y = game_menu.get_arrow_position()
         x *= self.unit_size

@@ -97,3 +97,21 @@ class Player:
     
     def get_move_state(self):
         return (self.action, self.direction)
+    
+    def next_coordinates(self, direction=None):
+        next_x = self.x
+        next_y = self.y
+
+        if direction is None:
+            direction = self.direction
+
+        if direction == LEFT:
+            next_x -= 1
+        elif direction == RIGHT:
+            next_x += 1
+        elif direction == UP:
+            next_y -= 1
+        else:
+            next_y += 1
+
+        return next_x, next_y

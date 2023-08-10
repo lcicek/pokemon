@@ -11,7 +11,7 @@ from controller import Controller
 from utility import *
 import movementHandler
 from renderer import Renderer
-from gameMenu import GameMenu
+from infoBox import GameMenu, DialogueBox
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN # window starting position on screen
 
@@ -31,6 +31,7 @@ animator = Animator()
 renderer = Renderer()
 
 game_menu = GameMenu()
+dialogue_box = DialogueBox()
 
 ### LOCKS ###
 move_lock = MovementLock()
@@ -57,8 +58,8 @@ while running:
             game_menu.rescale(scale)
 
     controller.listen()
-    
-    current_state = update_game_state(controller, move_lock, outside_lock, player, game_menu)
+
+    current_state = update_game_state(controller, move_lock, outside_lock, player, location, game_menu, dialogue_box)
     
     if game_state != current_state:
         game_state = current_state
@@ -68,9 +69,11 @@ while running:
         movementHandler.handle_movement(controller, player, location, move_lock, outside_lock)
     elif game_state == GAME_MENU:
         handle_menu_navigation(controller, game_menu, outside_lock, arrow_lock, move_lock, player)
+    elif game_state == DIALOGUE:
+        handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, arrow_lock)
     
     animator.animate_player(player, move_lock)
-    renderer.render(player, location, animator, move_lock, game_menu)
+    renderer.render(player, location, animator, move_lock, game_state, game_menu, dialogue_box)
 
     clock.tick(FPS)
 

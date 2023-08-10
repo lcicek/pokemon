@@ -10,6 +10,7 @@ class Location:
     def __init__(self, graphic, foreground_graphic) -> None:
         self.map = []
         self.init_map()
+        self.init_objects()
         
         self.graphic = Graphic(graphic)
         self.foreground_graphic = Graphic(foreground_graphic)
@@ -37,8 +38,8 @@ class Location:
 
         for tag in root:
             for interactor in tag:
-                x = interactor.attrib['x']
-                y = interactor.attrib['y']
+                x = int(interactor.attrib['x'])
+                y = int(interactor.attrib['y'])
                 self.map[x][y] = Interactor(interactor.text)
 
     def init_map(self):

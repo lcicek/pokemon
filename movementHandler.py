@@ -61,28 +61,13 @@ def walk(player, direction):
 def sprint(player, direction):
     player.update(action=SPRINTING, direction=direction, move=True)
 
-def next_coordinates(player, direction):
-        next_x = player.x
-        next_y = player.y
-
-        if direction == LEFT:
-            next_x -= 1
-        elif direction == RIGHT:
-            next_x += 1
-        elif direction == UP:
-            next_y -= 1
-        else:
-            next_y += 1
-
-        return next_x, next_y
-
 def next_square_is_jumpable(player, location, direction):
-    next_x, next_y = next_coordinates(player, direction)
+    next_x, next_y = player.next_coordinates(direction)
     
     return location.square_is_jumping_ledge(next_y, next_x, direction)
 
 def next_square_is_walkable(player, location, direction):
-    next_x, next_y = next_coordinates(player, direction)
+    next_x, next_y = player.next_coordinates(direction)
     next_blocks = location.square_is_solid(next_y, next_x, direction)
     
     return not (next_blocks or next_is_out_of_bounds(next_x, next_y, location))

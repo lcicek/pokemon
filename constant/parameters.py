@@ -12,6 +12,7 @@ START = 'i'
 ### GAME STATES ###
 OUTSIDE = 0
 GAME_MENU = 1
+DIALOGUE = 2
 
 ### ACTION ###
 STANDING = "standing"
