@@ -1,6 +1,8 @@
-from constant.paths import GAME_MENU_PATH, ARROW_RIGHT_PATH, ARROW_DOWN_PATH, DIALOGUE_BOX_PATH
-from constant.parameters import X, Y, UNIT_SIZE, UP, DOWN
+from constant.paths import GAME_MENU_PATH, ARROW_RIGHT_PATH, ARROW_DOWN_PATH, DIALOGUE_BOX_PATH, TEXT_FONT
+from constant.parameters import X, Y, UNIT_SIZE, UP, DOWN, FONT_COLOR
+from pygame import font
 from graphic import Graphic
+from PIL import ImageDraw
 
 class InfoBox:
     def __init__(self, graphic_path, x_offset, y_offset, inner_offset) -> None:
@@ -35,15 +37,57 @@ class DialogueBox(InfoBox):
     def __init__(self) -> None:
         super().__init__(DIALOGUE_BOX_PATH, 1, Y-4, 1)
 
+        self.font = font.Font(TEXT_FONT, 20)
+
         self.arrow_graphic = Graphic(ARROW_DOWN_PATH)
         self.arrow_x_offset = X - 2
         self.arrow_y_offset = Y - 1.5
 
-        self.reached_end = None # end of dialogue
         self.text = None
+        self.num_lines = None
+        self.current_line = None
+        self.end = None
+
+    def next(self):
+        if self.current_line + 1 < self.num_lines:
+            self.current_line += 2
+        elif self.current_line < self.num_lines:
+            self.current_line += 1
+        
+        if self.current_line + 1 >= self.num_lines:
+            self.end = True
+
+    def open(self, text):
+        assert len(text) > 0
+
+        super().open()
+
+        self.text = text
+        self.num_lines = len(text)
+        self.current_line = 1
+        self.end = self.current_line == self.num_lines
+
+    def get_text_positions(self):
+        first_x_offset = self.x_offset + self.inner_offset
+        first_y_offset = self.y_offset + self.inner_offset
+
+        second_x_offset = first_x_offset
+        second_y_offset = first_y_offset + self.inner_offset
+
+        return first_x_offset, first_y_offset, second_x_offset, second_y_offset
+
+    def get_text_graphics(self):
+        first_line = self.font.render(self.text[self.current_line-1], False, FONT_COLOR)
+
+        if self.current_line == self.num_lines:
+            second_line = None
+        else:
+            second_line = self.font.render(self.text[self.current_line], False, FONT_COLOR) 
+
+        return first_line, second_line
 
     def end_reached(self):
-        return True # change
+        return self.end
     
     def get_arrow_position(self):
         return self.arrow_x_offset, self.arrow_y_offset

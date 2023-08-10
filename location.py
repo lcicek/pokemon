@@ -5,6 +5,7 @@ from graphic import Graphic
 from interactor import Interactor
 from constant.paths import MAP_CSV_PATH, MAP_XML_PATH
 from constant.locationCodebook import *
+from constant.parameters import CHARACTERS_PER_LINE
 
 class Location:
     def __init__(self, graphic, foreground_graphic) -> None:
@@ -40,7 +41,8 @@ class Location:
             for interactor in tag:
                 x = int(interactor.attrib['x'])
                 y = int(interactor.attrib['y'])
-                self.map[x][y] = Interactor(interactor.text)
+                text = self.format_text(interactor.text)
+                self.map[x][y] = Interactor(text)
 
     def init_map(self):
         with open(MAP_CSV_PATH) as csv_file:
@@ -55,6 +57,36 @@ class Location:
                 row[i] = dictionary[elem]
         
         return row
+
+    # could probably be optimized:
+    def format_text(self, text_string):
+        if len(text_string) <= CHARACTERS_PER_LINE:
+            return [text_string]
+        
+        text = []
+        text_string = text_string.split(' ')
+
+        for i, word in enumerate(text_string):
+            if i != len(text_string)-1:
+                text_string[i] = word + ' ' # add space to all characters but the last
+
+        line_length = 0
+        current_string = ""
+        for word in text_string:
+            if line_length + len(word) <= CHARACTERS_PER_LINE:
+                line_length += len(word)
+                current_string += word
+            else:
+                assert len(word) <= CHARACTERS_PER_LINE
+
+                text.append(current_string)
+                line_length = len(word)
+                current_string = word
+        
+        if len(current_string) > 0:
+            text.append(current_string)
+
+        return text
 
 """
     def init_map(self):

@@ -37,6 +37,7 @@ dialogue_box = DialogueBox()
 move_lock = MovementLock()
 outside_lock = Lock()
 arrow_lock = MovementLock()
+dialogue_lock = MovementLock()
 
 ### LOG ###
 frames = 0
@@ -70,7 +71,7 @@ while running:
     elif game_state == GAME_MENU:
         handle_menu_navigation(controller, game_menu, outside_lock, arrow_lock, move_lock, player)
     elif game_state == DIALOGUE:
-        handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, arrow_lock)
+        handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, dialogue_lock)
     
     animator.animate_player(player, move_lock)
     renderer.render(player, location, animator, move_lock, game_state, game_menu, dialogue_box)

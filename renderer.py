@@ -48,6 +48,19 @@ class Renderer:
         y *= self.unit_size
         self.screen.blit(dialogue_box.get_arrow_graphic(), (x, y))
 
+        first_line, second_line = dialogue_box.get_text_graphics()
+        x1, y1, x2, y2 = dialogue_box.get_text_positions()
+
+        if first_line is not None:
+            x1 *= self.unit_size
+            y1 *= self.unit_size
+            self.screen.blit(first_line, (x1, y1))
+        
+        if second_line is not None:
+            x2 *= self.unit_size
+            y2 *= self.unit_size
+            self.screen.blit(second_line, (x2, y2))
+
     def renderGameMenu(self, game_menu):
         x, y = game_menu.get_position()
         x *= self.unit_size

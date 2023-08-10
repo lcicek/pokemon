@@ -13,7 +13,7 @@ from constant.parameters import (
 )
 
 # similar to handle_menu_navigation:
-def handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, arrow_lock):
+def handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, dialogue_lock):
     if move_lock.is_locked(): # wait for movement to finish before enabling menu actions
         return
 
@@ -27,11 +27,12 @@ def handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, a
         outside_lock.unlock()
         return
 
-    if arrow_lock.is_locked():
-        arrow_lock.update()
+    if dialogue_lock.is_locked():
+        dialogue_lock.update()
 
-    if arrow_lock.is_unlocked() and controller.has_movement_input():
-        arrow_lock.lock(FRAMES_PER_SELECT)
+    if dialogue_lock.is_unlocked() and (controller.action_keys[A] or controller.action_keys[B]):
+        dialogue_box.next()
+        dialogue_lock.lock(FRAMES_PER_SELECT)
 
 def try_to_open_game_menu(controller, outside_lock, player, game_menu):
     if controller.action_keys[START]: # start was pressed = game menu was opened
@@ -42,9 +43,10 @@ def try_to_open_game_menu(controller, outside_lock, player, game_menu):
 def try_to_open_dialogue(controller, outside_lock, player, location, dialogue_box):
     if controller.action_keys[A]:
         next_x, next_y = player.next_coordinates()
+        interactor = location.map[next_x][next_y]
 
-        if isinstance(location.map[next_x][next_y], Interactor):
-            dialogue_box.open()
+        if isinstance(interactor, Interactor):
+            dialogue_box.open(interactor.text)
             outside_lock.lock()
             controller.action_keys[A] = False
 
