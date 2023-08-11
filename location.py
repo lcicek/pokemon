@@ -20,7 +20,7 @@ class Location:
         self.height = self.graphic.height // UNIT_SIZE # height in tiles
 
     def square_is_solid(self, col, row, direction):
-        return self.map[col][row] == SOLID or self.square_is_blocking_ledge(col, row, direction)
+        return self.map[col][row] == SOLID or self.square_is_blocking_ledge(col, row, direction) or isinstance(self.map[col][row], Interactor)
 
     def square_is_ledge(self, col, row):
         return self.map[col][row] == LEDGE_DOWN or self.map[col][row] == LEDGE_LEFT or self.map[col][row] == LEDGE_RIGHT
@@ -42,7 +42,7 @@ class Location:
                 x = int(interactor.attrib['x'])
                 y = int(interactor.attrib['y'])
                 text = self.format_text(interactor.text)
-                self.map[x][y] = Interactor(text)
+                self.map[y][x] = Interactor(text)
 
     def init_map(self):
         with open(MAP_CSV_PATH) as csv_file:

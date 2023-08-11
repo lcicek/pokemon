@@ -51,7 +51,7 @@ def try_to_open_game_menu(controller, outside_lock, player, game_menu):
 def try_to_open_dialogue(controller, outside_lock, player, location, dialogue_box, dialogue_lock):
     if controller.action_keys[A]:
         next_x, next_y = player.next_coordinates()
-        interactor = location.map[next_x][next_y]
+        interactor = location.map[next_y][next_x]
 
         if isinstance(interactor, Interactor):
             dialogue_box.open(interactor.text)
