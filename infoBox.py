@@ -116,7 +116,7 @@ class DialogueBox(InfoBox):
         self.text = text
         self.num_lines = len(text)
         self.current_line = 0
-        self.end = self.current_line+1 == self.num_lines
+        self.end = self.current_line+1 == self.num_lines-1
 
     def get_text_positions(self): # in px
         return self.padding, self.padding, self.padding, self.second_line_y_offset
