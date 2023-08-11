@@ -14,7 +14,7 @@ cyan = args.cyan
 BOTTOM_LEFT_CORNER_PATH = "sprites/displayBox/bottom-left-corner.png" if not cyan else "sprites/displayBox/bottom-left-corner-dialogue.png"
 BOTTOM_EDGE_PATH = "sprites/displayBox/bottom-edge.png" if not cyan else "sprites/displayBox/bottom-edge-dialogue.png"
 MIDDLE_PATH = "sprites/displayBox/middle.png"
-FONT_PATH = "sprites/displayBox/font.ttf"
+FONT_PATH = "sprites/displayBox/bold_font.ttf"
 
 unit_size = 8
 
@@ -60,6 +60,7 @@ for y in range(0, h, unit_size):
         
         image.paste(curr, box=(x, y))
 
+"""
 texts = ["POKEMON", "BAG", "SAVE", "OPTIONS", "EXIT"]
 i = 0
 for y in range(2*unit_size, h-unit_size, unit_size*3):
@@ -68,6 +69,6 @@ for y in range(2*unit_size, h-unit_size, unit_size*3):
 
     draw.text(xy=(2*unit_size, y), text=texts[i], font=font, fill='#444444')
     i += 1
-
+"""
 
 image.save(f"sprites/displayBox/generated/{name}.png")

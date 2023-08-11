@@ -12,8 +12,8 @@ class Graphic:
     def init(self):
         img = image.load(self.file)
 
-        self.width = img.get_width() // UNIT_SIZE
-        self.height = img.get_height() // UNIT_SIZE
+        self.width = img.get_width()
+        self.height = img.get_height()
 
         self.rescale(DEFAULT_SCALE)
 

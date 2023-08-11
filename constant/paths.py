@@ -13,7 +13,8 @@ ARROW_DOWN_PATH = "sprites/displayBox/arrow-down.png"
 DIALOGUE_BOX_PATH = "sprites/displayBox/generated/dialogue.png"
 
 ### TEXT FONT ###
-TEXT_FONT = "sprites/displayBox/font.ttf"
+BOLD_FONT = "sprites/displayBox/bold_font.ttf"
+DIALOGUE_FONT = "sprites/displayBox/DePixelSchmal.ttf"
 
 ### ANIMATION ###
 # STANDING

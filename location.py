@@ -5,7 +5,7 @@ from graphic import Graphic
 from interactor import Interactor
 from constant.paths import MAP_CSV_PATH, MAP_XML_PATH
 from constant.locationCodebook import *
-from constant.parameters import CHARACTERS_PER_LINE
+from constant.parameters import CHARACTERS_PER_LINE, UNIT_SIZE
 
 class Location:
     def __init__(self, graphic, foreground_graphic) -> None:
@@ -16,8 +16,8 @@ class Location:
         self.graphic = Graphic(graphic)
         self.foreground_graphic = Graphic(foreground_graphic)
 
-        self.width = self.graphic.width # width in tiles
-        self.height = self.graphic.height # height in tiles
+        self.width = self.graphic.width // UNIT_SIZE # width in tiles
+        self.height = self.graphic.height // UNIT_SIZE # height in tiles
 
     def square_is_solid(self, col, row, direction):
         return self.map[col][row] == SOLID or self.square_is_blocking_ledge(col, row, direction)

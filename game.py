@@ -41,7 +41,7 @@ dialogue_lock = MovementLock()
 
 ### LOG ###
 frames = 0
-log_frame = FPS * 10
+log_frame = FPS * 1
 
 while running:
     start_time = pygame.time.get_ticks()
@@ -57,6 +57,7 @@ while running:
             scale_location(location, scale)
             renderer.rescale(scale)
             game_menu.rescale(scale)
+            dialogue_box.rescale(scale)
 
     controller.listen()
 

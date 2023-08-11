@@ -97,6 +97,7 @@ def scale_location(location, scale):
 
 def calculate_scale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
+    scale = round(scale)
     scale = min(scale, MAX_SCALE)
     scale = max(scale, MIN_SCALE)
 
