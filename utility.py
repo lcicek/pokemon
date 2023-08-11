@@ -28,16 +28,16 @@ def handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, d
     if not player.is_standing(): # set player state to standing while game menu is open
         stop(player)
 
-    dialogue_will_be_closed = dialogue_box.is_active() and dialogue_box.end_reached() and (controller.action_keys[A] or controller.action_keys[B])
-
-    if dialogue_will_be_closed:
-        dialogue_box.close()
-        outside_lock.unlock()
-        return
-
     if dialogue_lock.is_locked():
         dialogue_lock.update()
 
+    dialogue_will_be_closed = dialogue_box.is_active() and dialogue_box.end_reached() and (controller.action_keys[A] or controller.action_keys[B])
+
+    if dialogue_lock.is_unlocked() and dialogue_will_be_closed:
+        dialogue_box.close()
+        outside_lock.unlock()
+        return
+    
     if dialogue_lock.is_unlocked() and (controller.action_keys[A] or controller.action_keys[B]):
         dialogue_box.next()
         lock_dialogue(dialogue_box, dialogue_lock)
