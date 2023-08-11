@@ -38,30 +38,34 @@ class Renderer:
         self.screen.blit(graphic.scaled_image, (x, y))
 
     def renderDialogueBox(self, dialogue_box):
-        x, y = dialogue_box.get_position()
-        x *= self.unit_size
-        y *= self.unit_size
-        self.screen.blit(dialogue_box.get_graphic(), (x, y))
+        x, y = self.render_infobox(dialogue_box)
 
-        text_graphic = dialogue_box.get_text_graphic()
-        self.screen.blit(text_graphic, (x, y))
+        text_graphics, coordinates = dialogue_box.get_text_graphics()
+        for i, graphic in enumerate(text_graphics):
+            x_offset = coordinates[i][0] * self.unit_size
+            y_offset = coordinates[i][1] * self.unit_size
+            self.screen.blit(graphic, (x + x_offset, y + y_offset))
 
         if not dialogue_box.end_reached():
-            x, y = dialogue_box.get_arrow_position()
-            x *= self.unit_size
-            y *= self.unit_size
-            self.screen.blit(dialogue_box.get_arrow_graphic(), (x, y))
+            self.render_infobox_arrow(dialogue_box)
+
+    def render_infobox(self, infobox):
+        x, y = infobox.get_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(infobox.get_graphic(), (x, y))
+
+        return x, y
+
+    def render_infobox_arrow(self, infobox):
+        x, y = infobox.get_arrow_position()
+        x *= self.unit_size
+        y *= self.unit_size
+        self.screen.blit(infobox.get_arrow_graphic(), (x, y))
 
     def renderGameMenu(self, game_menu):
-        x, y = game_menu.get_position()
-        x *= self.unit_size
-        y *= self.unit_size
-        self.screen.blit(game_menu.get_graphic(), (x, y))
-
-        x, y = game_menu.get_arrow_position()
-        x *= self.unit_size
-        y *= self.unit_size
-        self.screen.blit(game_menu.get_arrow_graphic(), (x, y))
+        self.render_infobox(game_menu)
+        self.render_infobox_arrow(game_menu)
 
     def calculate_location_position(self, player, move_lock):
         player_did_not_walk = move_lock.is_unlocked() or player.is_standing()

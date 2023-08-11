@@ -1,8 +1,16 @@
-from constant.paths import GAME_MENU_PATH, ARROW_RIGHT_PATH, ARROW_DOWN_PATH, DIALOGUE_BOX_PATH, DIALOGUE_FONT
-from constant.parameters import X, Y, UNIT_SIZE, UP, DOWN, FONT_COLOR, DEFAULT_SCALE
 import pygame
+
 from graphic import Graphic
-from PIL import Image, ImageDraw, ImageFont
+from constant.paths import (
+    GAME_MENU_PATH, ARROW_RIGHT_PATH, ARROW_DOWN_PATH, DIALOGUE_BOX_PATH, DIALOGUE_FONT
+)
+from constant.parameters import (
+    X, Y,
+    UNIT_SIZE, DEFAULT_SCALE,
+    UP, DOWN, 
+    FONT_COLOR,
+    CHARACTERS_PER_FRAME
+)
 
 class InfoBox:
     def __init__(self, graphic_path, x_offset, y_offset) -> None:
@@ -45,69 +53,94 @@ class DialogueBox(InfoBox):
         self.arrow_x_offset = self.x_offset + self.width - 1 # leave room of one unit size for arrow (at the right)
         self.arrow_y_offset = self.y_offset + self.height - 1 # leave room of one unit for arrow (at the bottom)
 
+        self.font_size = 9
+        self.font = pygame.font.Font(DIALOGUE_FONT, size=self.font_size*DEFAULT_SCALE)
+        self.pointer = None
+
         # DRAW TEXT:
         self.size = (self.box_graphic.width, self.box_graphic.height)
         self.scaled_size = (self.box_graphic.width * DEFAULT_SCALE, self.box_graphic.height * DEFAULT_SCALE)
-        
-        self.font = ImageFont.truetype(font=DIALOGUE_FONT, size=9) # original font size is 9px
-        self.empty_image = Image.new(mode='RGBA', size=self.size, color=(0, 0, 0, 0)) # transparent color
-        self.text_image = None
-
-        self.padding = UNIT_SIZE * 0.65 # here: values in pixels (to draw text on images):
-        self.second_line_y_offset = self.padding + UNIT_SIZE
+    
+        self.padding = 0.65 # here: values in pixels (to draw text on images):
+        self.second_line_y_offset = self.padding + 1 
 
         self.text = None
         self.num_lines = None
         self.current_line = None
-        self.end = None     
+        self.end = None
 
-    def clear_text(self):
-        self.text_image = self.empty_image.copy()
+    def increment_pointer(self):
+        self.pointer += CHARACTERS_PER_FRAME
 
-    def draw_text(self):
-        self.clear_text()
-        draw = ImageDraw.Draw(im=self.text_image)
+    def get_first_line(self):
+        if self.pointer >= len(self.text[self.current_line]):
+            return self.text[self.current_line]
+        else:
+            return self.text[self.current_line][0:self.pointer]
+        
+    def get_second_line(self):
+        if not self.second_line_exists() or self.pointer < len(self.text[self.current_line]):
+            return None
+        
+        index = self.pointer - len(self.text[self.current_line])
 
-        x1, y1, x2, y2 = self.get_text_positions()
-        draw.text(xy=(x1, y1), text=self.text[self.current_line-1], font=self.font, fill=FONT_COLOR)
+        if index >= len(self.text[self.current_line+1]):
+            return self.text[self.current_line+1]
+        else:
+            return self.text[self.current_line+1][0:index]
+
+    def get_current_text_length(self):
+        length = len(self.text[self.current_line])
 
         if self.second_line_exists():
-            draw.text(xy=(x2, y2), text=self.text[self.current_line], font=self.font, fill=FONT_COLOR)
+            length += len(self.text[self.current_line+1])
+
+        return length
 
     def next(self):
-        if self.current_line + 1 < self.num_lines:
+        self.pointer = 0
+
+        if self.current_line + 2 < self.num_lines:
             self.current_line += 2
-        elif self.current_line < self.num_lines:
+        elif self.current_line + 1 < self.num_lines:
             self.current_line += 1
 
-        self.draw_text()
-
-        if self.current_line + 1 >= self.num_lines:
+        if self.current_line + 2 >= self.num_lines:
             self.end = True
 
     def open(self, text):
         assert len(text) > 0
-
         super().open()
 
+        self.pointer = CHARACTERS_PER_FRAME - 1 if CHARACTERS_PER_FRAME <= len(text) else len(text) - 1
         self.text = text
         self.num_lines = len(text)
-        self.current_line = 1
-        self.end = self.current_line == self.num_lines
-
-        self.draw_text()
+        self.current_line = 0
+        self.end = self.current_line+1 == self.num_lines
 
     def get_text_positions(self): # in px
         return self.padding, self.padding, self.padding, self.second_line_y_offset
 
     def second_line_exists(self):
-        return self.current_line < self.num_lines
+        return self.current_line+1 < self.num_lines
 
-    def get_text_graphic(self):
-        pygame_surface = pygame.image.fromstring(self.text_image.tobytes(), self.size, self.text_image.mode).convert_alpha()
-        pygame_surface = pygame.transform.scale(pygame_surface, self.scaled_size)
+    def get_text_graphics(self):
+        lines = []
+        first_line = self.get_first_line()
+        second_line = self.get_second_line()
+        self.increment_pointer()
+
+        lines.append(self.font.render(first_line, False, FONT_COLOR))
         
-        return pygame_surface
+        if second_line is not None:
+            lines.append(self.font.render(second_line, False, FONT_COLOR))
+
+        coordinates = []
+        x1_off, y1_off, x2_off, y2_off = self.get_text_positions()
+        coordinates.append((x1_off, y1_off))
+        coordinates.append((x2_off, y2_off)) 
+        
+        return lines, coordinates
 
     def end_reached(self):
         return self.end
@@ -119,6 +152,7 @@ class DialogueBox(InfoBox):
         return self.arrow_graphic.scaled_image
 
     def rescale(self, scale):
+        self.font = pygame.font.Font(DIALOGUE_FONT, self.font_size * scale)
         self.scaled_size = (self.size[0] * scale, self.size[1] * scale)
         self.box_graphic.rescale(scale)
         self.arrow_graphic.rescale(scale)

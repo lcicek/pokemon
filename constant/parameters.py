@@ -57,6 +57,7 @@ TIME_PER_FRAME_MS = 1_000 // FPS # frame time in milliseconds
 
 ### TIME: SELECT ###
 FRAMES_PER_SELECT = 10
+CHARACTERS_PER_FRAME = 5 # For dialogue animation
 
 ### TIME: MOVEMENT ###
 FRAMES_PER_TURN = 8

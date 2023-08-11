@@ -61,7 +61,7 @@ while running:
 
     controller.listen()
 
-    current_state = update_game_state(controller, move_lock, outside_lock, player, location, game_menu, dialogue_box)
+    current_state = update_game_state(controller, move_lock, outside_lock, player, location, game_menu, dialogue_box, dialogue_lock)
     
     if game_state != current_state:
         game_state = current_state
