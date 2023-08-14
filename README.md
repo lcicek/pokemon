@@ -1,6 +1,11 @@
 # Pokemon Clone (ongoing project)
 This project doesn't rely on any outside resources or tutorials and uses external libraries only minimally (namely for the game loop, GUI and key inputs).
 
+## Demo: ##
+![](https://github.com/lcicek/pokemon/blob/master/demo.gif)
+<br>
+<i>Note: frame rate and quality of gif reduced dramatically due to file size constraints on GitHub.</i>
+
 ## Progress: ##
 Current functionalities include:
 <ul>
@@ -11,8 +16,3 @@ Current functionalities include:
   <li>Locking of new player movement during active movement/animation and active menu or dialogue screen.</li>
   <li>Window rescaling (limited to integer scale values due to blurriness of bitmap fonts when rescaled to float values).</li>
 </ul>
-
-## Demo: ##
-![](https://github.com/lcicek/pokemon/blob/master/demo.gif)
-<br>
-<i>Note: frame rate and quality of gif reduced dramatically due to file size constraints on GitHub.</i>
