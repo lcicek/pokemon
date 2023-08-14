@@ -1,3 +1,6 @@
 __pycache__
 tiles
 sprites
+notes
+notes/*
+generate.py
