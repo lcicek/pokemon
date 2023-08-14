@@ -2,7 +2,7 @@
 This project doesn't rely on any outside resources or tutorials and uses external libraries only minimally (namely for the game loop, GUI and key inputs).
 
 ## Progress: ##
-Current functionalities includes:
+Current functionalities include:
 <ul>
   <li>Keyboard input processing, player movement (turning, walking, sprinting, jumping) and corresponding animations (e.g. walk cycle).</li>
   <li>Out of bounds and collision detection (for all solid objects or ledges).</li>
