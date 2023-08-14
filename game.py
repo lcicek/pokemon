@@ -73,8 +73,6 @@ while running:
         handle_menu_navigation(controller, game_menu, outside_lock, arrow_lock, move_lock, player)
     elif game_state == DIALOGUE:
         handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, dialogue_lock)
-    
-    print((player.x, player.y))
 
     animator.animate_player(player, move_lock)
     renderer.render(player, location, animator, move_lock, game_state, game_menu, dialogue_box)
