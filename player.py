@@ -5,16 +5,14 @@ from constant.parameters import (
 
 class Player:
     def __init__(self) -> None:
-        self.x = 10
-        self.y = 11
+        self.x = 20
+        self.y = 22
 
-        self.prev_x = 10
-        self.prev_y = 11
+        self.prev_x = 20
+        self.prev_y = 22
 
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
-        
-        self.continuous_steps = 0 # to track continuous walk/sprint steps
 
     def get_previous_delta(self):
         delta_x = self.x - self.prev_x
@@ -46,30 +44,20 @@ class Player:
         elif self.action == WALKING or self.action == SPRINTING:
             self.step(step_size=1)
 
-    def update_step_number(self, state_changed):
-        if self.action == WALKING or self.action == SPRINTING:
-            if state_changed:
-                self.continuous_steps = 0
-            else:
-                self.continuous_steps += 1
-
     def update_state(self, action, direction):
         if self.action == action and self.direction == direction:
-            return False
+            return
 
         if action is not None:
             self.action = action
         
         if direction is not None:
             self.direction = direction
-        
-        return True
 
     def update(self, action=None, direction=None, move=False):
         assert action is not None or direction is not None
 
-        state_changed = self.update_state(action, direction)
-        self.update_step_number(state_changed)
+        self.update_state(action, direction)
 
         if move:
             self.update_position()
@@ -79,6 +67,9 @@ class Player:
 
     def turns(self, new_direction):
         return self.direction != new_direction
+
+    def is_moving(self):
+        return not self.is_standing()
 
     def is_jumping(self):
         return self.action == JUMPING

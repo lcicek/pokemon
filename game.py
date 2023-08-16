@@ -28,7 +28,7 @@ location = Location(LOCATION_SPRITE, LOCATION_FOREGROUND)
 
 controller = Controller(game_state)
 animator = Animator()
-renderer = Renderer()
+renderer = Renderer(player)
 
 game_menu = GameMenu()
 dialogue_box = DialogueBox()
@@ -74,7 +74,7 @@ while running:
     elif game_state == DIALOGUE:
         handle_dialogue(controller, player, dialogue_box, move_lock, outside_lock, dialogue_lock)
 
-    animator.animate_player(player, move_lock)
+    animator.animate(location, player, move_lock)
     renderer.render(player, location, animator, move_lock, game_state, game_menu, dialogue_box)
 
     clock.tick(FPS)

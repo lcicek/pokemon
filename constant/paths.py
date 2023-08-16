@@ -17,6 +17,12 @@ BOLD_FONT = "sprites/displayBox/bold_font.ttf"
 DIALOGUE_FONT = "sprites/displayBox/DePixelSchmal.ttf"
 
 ### ANIMATION ###
+## GRASS: ##
+GRASS_1 = "sprites/grass/grass-1.png"
+GRASS_2 = "sprites/grass/grass-2.png"
+GRASS_3 = "sprites/grass/grass-3.png"
+
+## PLAYER: ##
 # STANDING
 STANDING_FRONT = "sprites/player/standing-front.png"
 STANDING_BACK = "sprites/player/standing-back.png"

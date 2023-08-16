@@ -1,5 +1,7 @@
+from copy import deepcopy
+
 from graphic import Graphic
-from animation import Animation, WalkAnimation, JumpAnimation
+from animation import Animation, MoveAnimation, WalkAnimation
 from constant.paths import *
 from constant.parameters import (
     LEFT, RIGHT, UP, DOWN,
@@ -10,35 +12,66 @@ from constant.parameters import (
 
 class Animator:
     def __init__(self) -> None:
-        stand_frames, walk_frames, sprint_frames, jump_frames = self.init_player_frames()
-
-        self.player_animations = {
-            STANDING: Animation(stand_frames, 1, 0),
-            WALKING: WalkAnimation(walk_frames, WALK_CYCLE_LENGTH, FRAMES_PER_WALK),
-            SPRINTING: WalkAnimation(sprint_frames, SPRINT_CYCLE_LENGTH, FRAMES_PER_SPRINT),
-            JUMPING: JumpAnimation(jump_frames, JUMP_CYCLE_LENGTH, FRAMES_PER_JUMP)
-        }
+        self.init_player_animations() # sets self.player_animations
 
         self.active_player_animation = self.player_animations[STANDING]
+        self.active_player_animation.update_direction(DOWN) # default
+        
+        self.grass_animations = []
 
     def get_active_player_frame(self):
-        return self.active_player_animation.get_frame().scaled_image
+        return self.active_player_animation.get_frame()
 
-    def animate_player(self, player, move_lock):
-        # consider checking if state changed and only then executing this block:
+    def update_active_player_animation(self, player):
         self.active_player_animation = self.player_animations[player.action]
         self.active_player_animation.update_direction(player.direction)
+        self.active_player_animation.start()
 
-        if player.is_jumping():
-            self.active_player_animation.update_frame_number(move_lock.frames_since_start)
-        elif player.is_walking() or player.is_sprinting():
-            self.active_player_animation.update_frame_number(player.continuous_steps)
+    def animate(self, location, player, move_lock):
+        self.animate_player(player)
+        self.add_grass_animation(location, player, move_lock)
+
+        if len(self.grass_animations) > 0:
+            self.animate_grass()
+
+    def animate_grass(self):
+        remove = []
+        for i, animation_tuple in enumerate(self.grass_animations):
+            anim = animation_tuple[1]
+            anim.timestep()
+
+            if anim.frames_since_start > anim.duration: 
+                remove.append(i)
+
+        for index in remove:
+            self.grass_animations.pop(index)
+
+    def animate_player(self, player):
+        state_changed = not (self.player_animations[player.action] == self.active_player_animation and self.active_player_animation.direction == player.direction)
+        
+        if state_changed:
+            self.update_active_player_animation(player)
+        
+        self.active_player_animation.timestep()
+
+    def add_grass_animation(self, location, player, move_lock):
+        movement_is_new = move_lock.is_locked() and move_lock.frames_since_start == 1
+
+        if player.is_moving() and movement_is_new and location.square_is_grass(row=player.y, col=player.x):
+            position = (player.x, player.y)
+            self.grass_animations.append((position, self.new_grass_animation()))
 
     def rescale(self, scale):
-        for _, animation in self.player_animations.items():
-            animation.rescale_frames(scale)
+        for _, anim in self.player_animations.items():
+            anim.rescale_frames(scale)
 
-    def init_player_frames(self):
+        for anim in self.grass_animations:
+            anim.rescale_frames(scale)
+
+    def new_grass_animation(self):
+        return Animation([Graphic(GRASS_1), Graphic(GRASS_2), Graphic(GRASS_3)], 3, 30)
+
+    def init_player_animations(self):
         stand_frames = {
             DOWN: [Graphic(STANDING_FRONT)],
             UP: [Graphic(STANDING_BACK)],
@@ -67,4 +100,9 @@ class Animator:
             RIGHT: [Graphic(JUMPING_RIGHT_1), Graphic(JUMPING_RIGHT_2), Graphic(JUMPING_RIGHT_3)]
         }
 
-        return stand_frames, walk_frames, sprint_frames, jump_frames
+        self.player_animations = {
+            STANDING: MoveAnimation(stand_frames, 1, 1),
+            WALKING: WalkAnimation(walk_frames, WALK_CYCLE_LENGTH, FRAMES_PER_WALK),
+            SPRINTING: WalkAnimation(sprint_frames, SPRINT_CYCLE_LENGTH, FRAMES_PER_SPRINT),
+            JUMPING: MoveAnimation(jump_frames, JUMP_CYCLE_LENGTH, FRAMES_PER_JUMP)
+        }

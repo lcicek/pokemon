@@ -19,19 +19,22 @@ class Location:
         self.width = self.graphic.width // UNIT_SIZE # width in tiles
         self.height = self.graphic.height // UNIT_SIZE # height in tiles
 
-    def square_is_solid(self, col, row, direction):
-        return self.map[col][row] == SOLID or self.square_is_blocking_ledge(col, row, direction) or isinstance(self.map[col][row], Interactor)
+    def square_is_grass(self, row, col):
+        return self.map[row][col] == GRASS
 
-    def square_is_ledge(self, col, row):
-        return self.map[col][row] == LEDGE_DOWN or self.map[col][row] == LEDGE_LEFT or self.map[col][row] == LEDGE_RIGHT
+    def square_is_solid(self, row, col, direction):
+        return self.map[row][col] == SOLID or self.square_is_blocking_ledge(row, col, direction) or isinstance(self.map[row][col], Interactor)
 
-    def square_is_blocking_ledge(self, col, row, direction):
-        wrong_direction = self.map[col][row] != direction
-        return self.square_is_ledge(col, row) and wrong_direction
+    def square_is_ledge(self, row, col):
+        return self.map[row][col] == LEDGE_DOWN or self.map[row][col] == LEDGE_LEFT or self.map[row][col] == LEDGE_RIGHT
 
-    def square_is_jumping_ledge(self, col, row, direction):
-        same_direction = self.map[col][row] == direction
-        return self.square_is_ledge(col, row) and same_direction
+    def square_is_blocking_ledge(self, row, col, direction):
+        wrong_direction = self.map[row][col] != direction
+        return self.square_is_ledge(row, col) and wrong_direction
+
+    def square_is_jumping_ledge(self, row, col, direction):
+        same_direction = self.map[row][col] == direction
+        return self.square_is_ledge(row, col) and same_direction
 
     def init_objects(self):
         tree = ET.parse(MAP_XML_PATH)

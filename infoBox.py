@@ -55,7 +55,6 @@ class DialogueBox(InfoBox):
 
         self.font_size = 9
         self.font = pygame.font.Font(DIALOGUE_FONT, size=self.font_size*DEFAULT_SCALE)
-        self.pointer = None
 
         # DRAW TEXT:
         self.size = (self.box_graphic.width, self.box_graphic.height)
@@ -67,22 +66,23 @@ class DialogueBox(InfoBox):
         self.text = None
         self.num_lines = None
         self.current_line = None
+        self.character_count = None
         self.end = None
 
-    def increment_pointer(self):
-        self.pointer += CHARACTERS_PER_FRAME
+    def increment_character_count(self):
+        self.character_count += CHARACTERS_PER_FRAME
 
     def get_first_line(self):
-        if self.pointer >= len(self.text[self.current_line]):
+        if self.character_count >= len(self.text[self.current_line]):
             return self.text[self.current_line]
         else:
-            return self.text[self.current_line][0:self.pointer]
+            return self.text[self.current_line][0:self.character_count]
         
     def get_second_line(self):
-        if not self.second_line_exists() or self.pointer < len(self.text[self.current_line]):
+        if not self.second_line_exists() or self.character_count < len(self.text[self.current_line]):
             return None
         
-        index = self.pointer - len(self.text[self.current_line])
+        index = self.character_count - len(self.text[self.current_line])
 
         if index >= len(self.text[self.current_line+1]):
             return self.text[self.current_line+1]
@@ -98,7 +98,7 @@ class DialogueBox(InfoBox):
         return length
 
     def next(self):
-        self.pointer = 0
+        self.character_count = 0
 
         if self.current_line + 2 < self.num_lines:
             self.current_line += 2
@@ -112,7 +112,7 @@ class DialogueBox(InfoBox):
         assert len(text) > 0
         super().open()
 
-        self.pointer = CHARACTERS_PER_FRAME - 1 if CHARACTERS_PER_FRAME <= len(text) else len(text) - 1
+        self.character_count = CHARACTERS_PER_FRAME - 1 if CHARACTERS_PER_FRAME <= len(text) else len(text) - 1
         self.text = text
         self.num_lines = len(text)
         self.current_line = 0
@@ -128,7 +128,7 @@ class DialogueBox(InfoBox):
         lines = []
         first_line = self.get_first_line()
         second_line = self.get_second_line()
-        self.increment_pointer()
+        self.increment_character_count()
 
         lines.append(self.font.render(first_line, False, FONT_COLOR))
         

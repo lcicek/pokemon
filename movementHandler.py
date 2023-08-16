@@ -18,7 +18,7 @@ def execute_movement(input_direction, player, location, sprinting=False):
     if input_direction is None and player.is_standing(): # player stands and there is no new input:
         return 0
 
-    player_stopped_moving = input_direction is None and (player.is_walking() or player.is_jumping() or player.is_sprinting())
+    player_stopped_moving = input_direction is None and player.is_moving()
     direction_is_new = player.direction != input_direction
 
     if player_stopped_moving:

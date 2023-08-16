@@ -8,18 +8,30 @@ from constant.parameters import (
 )
 
 class Renderer:
-    def __init__(self) -> None:
+    def __init__(self, player) -> None:
         self.screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT), pygame.RESIZABLE)
         self.unit_size = UNIT_SIZE * DEFAULT_SCALE
+        
+        # render player at center:
+        self.player_x = (player.x - (player.x - X_HALF)) * self.unit_size # 
+        self.player_y = (player.y - (player.y - Y_HALF+1)) * self.unit_size
+
+        self.init_location_x_y(player)
+
+    def init_location_x_y(self, player):
+        self.location_x = -(player.x - X_HALF) * self.unit_size
+        self.location_y = -(player.y - Y_HALF) * self.unit_size
 
     def render(self, player, location, animator, move_lock, game_state, game_menu, dialogue_box):
         self.screen.fill("black")
 
-        x, y = self.calculate_location_position(player, move_lock)
+        self.update_shift(player, move_lock)
+        self.update_location()
 
-        self.renderGraphic(location.graphic, x, y)
+        self.renderGraphic(location.graphic)
         self.renderPlayer(animator)
-        self.renderGraphic(location.foreground_graphic, x, y)
+        self.renderGrass(animator, player, move_lock)
+        self.renderGraphic(location.foreground_graphic)
         
         if game_state == GAME_MENU:
             self.renderGameMenu(game_menu)
@@ -28,14 +40,21 @@ class Renderer:
 
         pygame.display.flip()
 
-    def renderPlayer(self, animator): # render player at center 
-            render_x = self.screen.get_width() * CENTER_X_RATIO
-            render_y = self.screen.get_height() * CENTER_Y_RATIO
-            frame = animator.active_player_animation.get_frame()
-            self.screen.blit(frame, (render_x, render_y))
+    def renderGrass(self, animator, player, move_lock):
+        for i, anim in enumerate(animator.grass_animations):
+            # position relative to location:
+            x = anim[0][0]
+            y = anim[0][1]
+            x, y = self.get_grass_position(x, y, player, i==1, move_lock)
+            frame = anim[1].get_frame()
 
-    def renderGraphic(self, graphic, x, y): 
-        self.screen.blit(graphic.scaled_image, (x, y))
+            self.screen.blit(frame, (x, y))
+
+    def renderPlayer(self, animator):
+        self.screen.blit(animator.get_active_player_frame(), (self.player_x, self.player_y))
+
+    def renderGraphic(self, graphic):
+        self.screen.blit(graphic.scaled_image, (self.location_x, self.location_y))
 
     def renderDialogueBox(self, dialogue_box):
         x, y = self.render_infobox(dialogue_box)
@@ -67,41 +86,47 @@ class Renderer:
         self.render_infobox(game_menu)
         self.render_infobox_arrow(game_menu)
 
-    def calculate_location_position(self, player, move_lock):
+    def update_location(self):
+        self.location_x += self.shift_x * self.unit_size
+        self.location_y += self.shift_y * self.unit_size
+
+    def update_shift(self, player, move_lock):
         player_did_not_walk = move_lock.is_unlocked() or player.is_standing()
-
         if player_did_not_walk or player.bumped():
-            x, y = self.target_render_position(player)
-        else:
-            delta_x, delta_y = player.get_previous_delta()
+            self.shift_x = 0
+            self.shift_y = 0
+            return
+        
+        step_x, step_y = player.get_previous_delta()
+        total_steps = move_lock.lock_duration
 
-            step = move_lock.frames_since_start
-            num_frames = move_lock.lock_duration
-            x = self.intermediate_position(player.prev_x, step, delta_x, num_frames)
-            y = self.intermediate_position(player.prev_y, step, delta_y, num_frames)
-            x, y = self.position_to_render_position(x, y)
+        # shift values are inverted since player moving right means shifting the location to the left
+        shift_x = -(step_x / total_steps)
+        shift_y = -(step_y / total_steps)
 
-        return x, y
+        self.shift_x = shift_x
+        self.shift_y = shift_y
 
-    def target_render_position(self, player):
-        target_x = (-player.x + X_HALF) * self.unit_size
-        target_y = (-player.y + Y_HALF) * self.unit_size
+    def get_grass_position(self, x, y, player, shift, move_lock):
+        delta_x, delta_y = player.get_previous_delta()
 
-        return target_x, target_y
+        absolute_x = x + (self.shift_x * move_lock.frames_since_start)
+        absolute_y = y + (self.shift_y * move_lock.frames_since_start)
 
-    def intermediate_position(self, start_position, step, direction, num_frames):
-        distance_per_step = direction / num_frames
-        intermediate_position = start_position + step * distance_per_step
+        if True:
+            delta_x = delta_x * (1-self.shift_x*move_lock.frames_since_start)
+            delta_y = delta_y * (1-self.shift_y*move_lock.frames_since_start)
 
-        return intermediate_position
+        print(delta_x, delta_y)
 
-    def position_to_render_position(self, x, y):
-        x = (-x + X_HALF) * self.unit_size
-        y = (-y + Y_HALF) * self.unit_size
+        absolute_x = (delta_x + X_HALF)
+        absolute_y = (delta_y + Y_HALF)
 
-        return x, y
+        return absolute_x, absolute_y
 
     def rescale(self, scale):
         self.screen = pygame.display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), pygame.RESIZABLE)
         self.unit_size = UNIT_SIZE * scale
 
+        self.player_x = self.screen.get_width() * CENTER_X_RATIO
+        self.player_y = self.screen.get_height() * CENTER_Y_RATIO
