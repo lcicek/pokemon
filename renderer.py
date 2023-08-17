@@ -13,12 +13,9 @@ class Renderer:
         self.unit_size = UNIT_SIZE * DEFAULT_SCALE
         
         # render player at center:
-        self.player_x = (player.x - (player.x - X_HALF)) * self.unit_size # 
-        self.player_y = (player.y - (player.y - Y_HALF+1)) * self.unit_size
+        self.player_x = self.screen.get_width() * CENTER_X_RATIO
+        self.player_y = self.screen.get_height() * CENTER_Y_RATIO
 
-        self.init_location_x_y(player)
-
-    def init_location_x_y(self, player):
         self.location_x = -(player.x - X_HALF) * self.unit_size
         self.location_y = -(player.y - Y_HALF) * self.unit_size
 
@@ -42,13 +39,24 @@ class Renderer:
 
     def renderGrass(self, animator, player, move_lock):
         for i, anim in enumerate(animator.grass_animations):
-            # position relative to location:
-            x = anim[0][0]
-            y = anim[0][1]
-            x, y = self.get_grass_position(x, y, player, i==1, move_lock)
-            frame = anim[1].get_frame()
+            if len(animator.grass_animations) == 2:
+                pass
 
+            x, y = anim[0]
+            x, y = self.map_to_window_position(x, y, player)
+            
+            if move_lock.is_locked():
+                x += self.shift_x * move_lock.frames_since_start
+                y += self.shift_y * move_lock.frames_since_start
+            else:
+                delta = player.get_previous_delta()
+                x += -delta[0] * self.unit_size
+                y += -delta[1] * self.unit_size
+
+            frame = anim[1].get_frame()
             self.screen.blit(frame, (x, y))
+            #print((x + self.shift_x * move_lock.frames_since_start, y + self.shift_y * move_lock.frames_since_start))
+
 
     def renderPlayer(self, animator):
         self.screen.blit(animator.get_active_player_frame(), (self.player_x, self.player_y))
@@ -87,16 +95,15 @@ class Renderer:
         self.render_infobox_arrow(game_menu)
 
     def update_location(self):
-        self.location_x += self.shift_x * self.unit_size
-        self.location_y += self.shift_y * self.unit_size
+        self.location_x += self.shift_x
+        self.location_y += self.shift_y
 
     def update_shift(self, player, move_lock):
-        player_did_not_walk = move_lock.is_unlocked() or player.is_standing()
-        if player_did_not_walk or player.bumped():
+        if player.is_standing() or player.bumped():
             self.shift_x = 0
             self.shift_y = 0
             return
-        
+
         step_x, step_y = player.get_previous_delta()
         total_steps = move_lock.lock_duration
 
@@ -104,25 +111,27 @@ class Renderer:
         shift_x = -(step_x / total_steps)
         shift_y = -(step_y / total_steps)
 
-        self.shift_x = shift_x
-        self.shift_y = shift_y
+        self.shift_x = shift_x * self.unit_size
+        self.shift_y = shift_y * self.unit_size
 
-    def get_grass_position(self, x, y, player, shift, move_lock):
-        delta_x, delta_y = player.get_previous_delta()
+    def map_to_window_position(self, x, y, player):
+        """
+        Transforms map position to window position. This is done by:
+            1. Using the player position to calculate the viewport.
+            2. Normalizing the viewport from (vp_x, vp_y) to (0, 0).
+            3. Saving the difference tuple (-vp_x, -vp_y) and adding it to (x, y).
+            4. Now each component in the viewport corresponds to a square on the window grid, where top-left=(0, 0) and bottom-right=(17, 13).
+            5. Lastly, the viewport grid is multiplied by self.unit_size to account for unit length and window rescaling.
+        """
+        viewport_coordinate = player.get_viewport_coordinate()
+        delta = player.get_previous_delta()
+        x -= viewport_coordinate[0] - delta[0]
+        y -= viewport_coordinate[1] - delta[1]
 
-        absolute_x = x + (self.shift_x * move_lock.frames_since_start)
-        absolute_y = y + (self.shift_y * move_lock.frames_since_start)
+        x *= self.unit_size
+        y *= self.unit_size
 
-        if True:
-            delta_x = delta_x * (1-self.shift_x*move_lock.frames_since_start)
-            delta_y = delta_y * (1-self.shift_y*move_lock.frames_since_start)
-
-        print(delta_x, delta_y)
-
-        absolute_x = (delta_x + X_HALF)
-        absolute_y = (delta_y + Y_HALF)
-
-        return absolute_x, absolute_y
+        return x, y 
 
     def rescale(self, scale):
         self.screen = pygame.display.set_mode((VIEWPORT_WIDTH * scale, VIEWPORT_HEIGHT * scale), pygame.RESIZABLE)

@@ -1,6 +1,7 @@
 from constant.parameters import (
     LEFT, RIGHT, UP, DOWN, 
-    STANDING, WALKING, SPRINTING, JUMPING
+    STANDING, WALKING, SPRINTING, JUMPING,
+    X_HALF, Y_HALF
 )
 
 class Player:
@@ -13,6 +14,10 @@ class Player:
 
         self.action = STANDING # STANDING, WALKING, SPRINTING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
+
+    def get_viewport_coordinate(self):
+        """Returns top-left coordinate of viewport."""
+        return (self.x - X_HALF, self.y - Y_HALF)
 
     def get_previous_delta(self):
         delta_x = self.x - self.prev_x
