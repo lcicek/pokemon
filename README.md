@@ -1,8 +1,4 @@
 # Pokemon Clone (ongoing project)
-## Demo: ##
-![](https://github.com/lcicek/pokemon/blob/master/demo.gif)
-<br>
-<i>Note: frame rate and quality of gif reduced dramatically due to file size constraints on GitHub.</i>
 
 ## Progress: ##
 Current functionalities include:
@@ -13,6 +9,7 @@ Current functionalities include:
   <li>Menu navigation.</li>
   <li>Locking of new player movement during active movement/animation and active menu or dialogue screen.</li>
   <li>Window rescaling (limited to integer scale values due to blurriness of bitmap fonts when rescaled to float values).</li>
+  <li>Grass animation.</li>
 </ul>
 
 ### Note: ###
