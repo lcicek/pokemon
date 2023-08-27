@@ -1,4 +1,6 @@
 __pycache__
 tiles
 sprites
-generate.py
+graphics/generate.py
+images
+maps

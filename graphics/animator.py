@@ -1,7 +1,7 @@
 from copy import deepcopy
 
-from graphic import Graphic
-from animation import Animation, MoveAnimation, WalkAnimation
+from graphics.graphic import Graphic
+from graphics.animation import Animation, MoveAnimation, WalkAnimation
 from constant.paths import *
 from constant.parameters import (
     LEFT, RIGHT, UP, DOWN,
@@ -18,7 +18,7 @@ class Animator:
         self.active_player_animation.update_direction(DOWN) # default
         
         self.grass_animations = []
-        self.grass_bottom = Graphic(GRASS_FOREGROUND)
+        self.grass_bottom = Graphic(GRASS_BOTTOM)
 
     def get_active_player_frame(self):
         return self.active_player_animation.get_frame()

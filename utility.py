@@ -2,9 +2,9 @@ from pygame import time
 import psutil
 import os
 import math
-from interactor import Interactor
+from logic.interactor import Interactor
 from psutil import cpu_percent
-from movementHandler import stop
+from logic.movementHandler import stop
 from constant.parameters import (
     VIEWPORT_WIDTH,
     MIN_SCALE, MAX_SCALE,

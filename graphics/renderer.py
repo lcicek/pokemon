@@ -21,40 +21,49 @@ class Renderer:
 
     def render(self, player, location, animator, move_lock, game_state, game_menu, dialogue_box):
         self.screen.fill("black")
-
         self.update_shift(player, move_lock)
         self.shift_location()
 
-        self.renderGraphic(location.graphic)
+        self.render_graphic(location.graphic)
 
         if len(animator.grass_animations) > 0:
-            self.render_grass(animator, player, move_lock)
+            self.render_grass(animator, player, move_lock) # also handles rendering of player
         else:
-            self.renderPlayer(animator)
+            self.render_player(animator)
 
+        ## foreground elements ##
         if location.square_is_grass(row=player.y, col=player.x):
             self.render_grass_bottom(location, animator, player, move_lock)
 
-        self.renderGraphic(location.foreground_graphic)
+        self.render_graphic(location.foreground_graphic)
         
+        ## menu/pop-up elements ##
         if game_state == GAME_MENU:
-            self.renderGameMenu(game_menu)
+            self.render_game_menu(game_menu)
         elif game_state == DIALOGUE:
-            self.renderDialogueBox(dialogue_box)
+            self.render_dialogue_box(dialogue_box)
 
         pygame.display.flip()
 
-    def render_grass(self, animator, player, move_lock):        
+    def render_grass(self, animator, player, move_lock):
+        """
+        Depending on the player movement direction, the grass animation has to be rendered
+        either in the foreground (above the player) or in the background (below the player).
+        
+        For upwards movement: first grass animation (head) = background and rest (tail) = foreground.
+        For downwards movement: first grass animation (head) = foreground and rest (tail) = background.
+        For horizontal movement: render whole grass animation in foreground.
+        """        
         if player.is_moving_down():
             self.render_grass_tail(animator, player, move_lock)
-            self.renderPlayer(animator)
+            self.render_player(animator)
             self.render_grass_head(animator, player, move_lock)
         elif player.is_moving_up():
             self.render_grass_head(animator, player, move_lock)
-            self.renderPlayer(animator)
+            self.render_player(animator)
             self.render_grass_tail(animator, player, move_lock)
-        else:
-            self.renderPlayer(animator)
+        else: # left/right movement
+            self.render_player(animator)
             self.render_grass_head(animator, player, move_lock)
             self.render_grass_tail(animator, player, move_lock)
 
@@ -74,6 +83,10 @@ class Renderer:
         self.screen.blit(frame, (x, y))
 
     def render_grass_bottom(self, location, animator, player, move_lock):
+        """
+        Renders the bottom of a grass square in the foreground (above the player), to give
+        the illusion that the player is standing in the grass.
+        """
         if location.square_is_grass(row=player.y, col=player.x) and not player.is_moving_up():
             frame = animator.grass_bottom.scaled_image
             x, y = (player.x, player.y)
@@ -82,6 +95,10 @@ class Renderer:
             self.screen.blit(frame, (x, y))
 
     def get_grass_position(self, x, y, player, move_lock):
+        """
+        Given a map (x, y) (e.g. (25, 13)), transforms it into a viewport (x, y) (e.g. (500, 250))
+        and shifts it accordingly if player is moving.
+        """
         x, y = self.map_to_window_position(x, y, player)
 
         if player.is_moving():
@@ -89,13 +106,13 @@ class Renderer:
         
         return x, y
 
-    def renderPlayer(self, animator):
+    def render_player(self, animator):
         self.screen.blit(animator.get_active_player_frame(), (self.player_x, self.player_y))
 
-    def renderGraphic(self, graphic):
+    def render_graphic(self, graphic):
         self.screen.blit(graphic.scaled_image, (self.location_x, self.location_y))
 
-    def renderDialogueBox(self, dialogue_box):
+    def render_dialogue_box(self, dialogue_box):
         x, y = self.render_infobox(dialogue_box)
 
         text_graphics, coordinates = dialogue_box.get_text_graphics()
@@ -121,7 +138,7 @@ class Renderer:
         y *= self.unit_size
         self.screen.blit(infobox.get_arrow_graphic(), (x, y))
 
-    def renderGameMenu(self, game_menu):
+    def render_game_menu(self, game_menu):
         self.render_infobox(game_menu)
         self.render_infobox_arrow(game_menu)
 

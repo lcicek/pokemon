@@ -1,8 +1,10 @@
+## Note: Location logic and graphics are still intertwined and maybe should be decoupled. ###
+
 import xml.etree.ElementTree as ET
 import csv
 
-from graphic import Graphic
-from interactor import Interactor
+from graphics.graphic import Graphic
+from logic.interactor import Interactor
 from constant.paths import MAP_CSV_PATH, MAP_XML_PATH
 from constant.locationCodebook import *
 from constant.parameters import CHARACTERS_PER_LINE, UNIT_SIZE
@@ -90,23 +92,3 @@ class Location:
             text.append(current_string)
 
         return text
-
-"""
-    def init_map(self):
-        tree = ET.parse(TILED_MAP_PATH)
-        root = tree.getroot()
-        map = root[1][0].text # change
-        map = map.split()
-        
-        width = int(root.attrib['width'])
-        height = int(root.attrib['height'])
-
-        for i, row in enumerate(map):
-            row = row.split(',')
-            row = row[0:width]
-            row = self.init_row(row)
-
-            map[i] = row
-
-        return map
-"""

@@ -1,17 +1,19 @@
 import os
 import pygame
 
-from lock import *
-from animator import Animator
-from location import Location
-from player import Player
 from constant.paths import LOCATION_SPRITE, LOCATION_FOREGROUND
 from constant.parameters import *
+from graphics.animator import Animator
+from graphics.renderer import Renderer
+from graphics.infoBox import GameMenu, DialogueBox
+
+from logic.location import Location
+from logic.player import Player
 from controller import Controller
+from logic.lock import Lock, MovementLock
 from utility import *
-import movementHandler
-from renderer import Renderer
-from infoBox import GameMenu, DialogueBox
+
+import logic.movementHandler as movementHandler
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = WINDOW_SPAWN # window starting position on screen
 

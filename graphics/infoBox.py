@@ -1,6 +1,6 @@
 import pygame
 
-from graphic import Graphic
+from graphics.graphic import Graphic
 from constant.paths import (
     GAME_MENU_PATH, ARROW_RIGHT_PATH, ARROW_DOWN_PATH, DIALOGUE_BOX_PATH, DIALOGUE_FONT
 )
