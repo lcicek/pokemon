@@ -100,10 +100,6 @@ def handle_menu_navigation(controller, game_menu, outside_lock, arrow_lock, move
         game_menu.move_arrow(controller.active_movement_key)
         arrow_lock.lock(FRAMES_PER_SELECT)
 
-def scale_location(location, scale):
-    location.graphic.rescale(scale)
-    location.foreground_graphic.rescale(scale)
-
 def calculate_scale(rescaled_width):
     scale = rescaled_width / VIEWPORT_WIDTH
     scale = round(scale)
@@ -111,6 +107,17 @@ def calculate_scale(rescaled_width):
     scale = max(scale, MIN_SCALE)
 
     return scale
+
+def rescale(renderer, animator, game_menu, dialogue_box, location):
+    scale = calculate_scale(renderer.screen.get_width())
+
+    renderer.rescale(scale)
+    animator.rescale(scale)
+    game_menu.rescale(scale)
+    dialogue_box.rescale(scale)
+
+    location.graphic.rescale(scale)
+    location.foreground_graphic.rescale(scale)
 
 def log(start_time):
     time_info = f"Time: (target={TIME_PER_FRAME_MS}ms, actual={(time.get_ticks() - start_time)}ms). "

@@ -54,15 +54,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.VIDEORESIZE:
-            scale = calculate_scale(renderer.screen.get_width())
-            animator.rescale(scale)
-            scale_location(location, scale)
-            renderer.rescale(scale)
-            game_menu.rescale(scale)
-            dialogue_box.rescale(scale)
+            rescale(animator, renderer, game_menu, dialogue_box, location)
 
     controller.listen()
-
     current_state = update_game_state(controller, move_lock, outside_lock, player, location, game_menu, dialogue_box, dialogue_lock)
     
     if game_state != current_state:
