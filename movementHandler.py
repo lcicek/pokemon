@@ -47,6 +47,7 @@ def stop(player):
 
 def turn(player, direction):
     player.update(direction=direction)
+    player.update_previous_position()
 
 def bump(player, direction, action):
     player.update(action=action, direction=direction)

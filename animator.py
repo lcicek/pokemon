@@ -7,7 +7,7 @@ from constant.parameters import (
     LEFT, RIGHT, UP, DOWN,
     STANDING, WALKING, JUMPING, SPRINTING,
     JUMP_CYCLE_LENGTH, WALK_CYCLE_LENGTH, SPRINT_CYCLE_LENGTH,
-    FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP
+    FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP, FRAMES_PER_GRASS_ANIMATION
 )
 
 class Animator:
@@ -58,8 +58,19 @@ class Animator:
         movement_is_new = move_lock.is_locked() and move_lock.frames_since_start == 1
 
         if player.is_moving() and movement_is_new and location.square_is_grass(row=player.y, col=player.x):
-            position = (player.x, player.y)
-            self.grass_animations.append((position, self.new_grass_animation()))
+            index = self.grass_animation_exists(player.x, player.y)
+
+            if index is not None:
+                self.grass_animations.pop(index) # delete old animation if exists
+            
+            self.grass_animations.append(((player.x, player.y), self.new_grass_animation()))
+
+    def grass_animation_exists(self, x, y):
+        for i, anim in enumerate(self.grass_animations):
+            if anim[0][0] == x and anim[0][1] == y:
+                return i
+        
+        return None
 
     def rescale(self, scale):
         for _, anim in self.player_animations.items():
@@ -69,7 +80,7 @@ class Animator:
             anim.rescale_frames(scale)
 
     def new_grass_animation(self):
-        return Animation([Graphic(GRASS_1), Graphic(GRASS_2), Graphic(GRASS_3)], 3, 30)
+        return Animation([Graphic(GRASS_1), Graphic(GRASS_2), Graphic(GRASS_3)], 3, FRAMES_PER_GRASS_ANIMATION)
 
     def init_player_animations(self):
         stand_frames = {

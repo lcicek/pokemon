@@ -23,7 +23,7 @@ class Renderer:
         self.screen.fill("black")
 
         self.update_shift(player, move_lock)
-        self.update_location()
+        self.shift_location()
 
         self.renderGraphic(location.graphic)
         self.renderPlayer(animator)
@@ -44,19 +44,12 @@ class Renderer:
 
             x, y = anim[0]
             x, y = self.map_to_window_position(x, y, player)
-            
-            if move_lock.is_locked():
-                x += self.shift_x * move_lock.frames_since_start
-                y += self.shift_y * move_lock.frames_since_start
-            else:
-                delta = player.get_previous_delta()
-                x += -delta[0] * self.unit_size
-                y += -delta[1] * self.unit_size
 
+            if player.is_moving():
+                x, y = self.shift_grass_animation(x, y, move_lock)
+            
             frame = anim[1].get_frame()
             self.screen.blit(frame, (x, y))
-            #print((x + self.shift_x * move_lock.frames_since_start, y + self.shift_y * move_lock.frames_since_start))
-
 
     def renderPlayer(self, animator):
         self.screen.blit(animator.get_active_player_frame(), (self.player_x, self.player_y))
@@ -94,17 +87,24 @@ class Renderer:
         self.render_infobox(game_menu)
         self.render_infobox_arrow(game_menu)
 
-    def update_location(self):
+    def shift_location(self):
         self.location_x += self.shift_x
         self.location_y += self.shift_y
 
+    def shift_grass_animation(self, x, y, move_lock):
+        x += self.shift_x * move_lock.frames_since_start
+        y += self.shift_y * move_lock.frames_since_start
+
+        return x, y
+
     def update_shift(self, player, move_lock):
         if player.is_standing() or player.bumped():
+            assert self.location_x == -(player.x - X_HALF)*self.unit_size and self.location_y == -(player.y - Y_HALF)*self.unit_size
             self.shift_x = 0
             self.shift_y = 0
             return
 
-        step_x, step_y = player.get_previous_delta()
+        step_x, step_y = player.get_delta()
         total_steps = move_lock.lock_duration
 
         # shift values are inverted since player moving right means shifting the location to the left
@@ -124,7 +124,7 @@ class Renderer:
             5. Lastly, the viewport grid is multiplied by self.unit_size to account for unit length and window rescaling.
         """
         viewport_coordinate = player.get_viewport_coordinate()
-        delta = player.get_previous_delta()
+        delta = player.get_delta()
         x -= viewport_coordinate[0] - delta[0]
         y -= viewport_coordinate[1] - delta[1]
 

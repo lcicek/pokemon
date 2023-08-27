@@ -19,7 +19,10 @@ class Player:
         """Returns top-left coordinate of viewport."""
         return (self.x - X_HALF, self.y - Y_HALF)
 
-    def get_previous_delta(self):
+    def get_delta(self):
+        if self.is_standing():
+            return 0, 0
+        
         delta_x = self.x - self.prev_x
         delta_y = self.y - self.prev_y
 
@@ -72,6 +75,9 @@ class Player:
 
     def turns(self, new_direction):
         return self.direction != new_direction
+
+    def is_moving_up(self):
+        return self.direction == UP and self.is_moving()
 
     def is_moving(self):
         return not self.is_standing()
