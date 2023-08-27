@@ -18,6 +18,7 @@ class Animator:
         self.active_player_animation.update_direction(DOWN) # default
         
         self.grass_animations = []
+        self.grass_bottom = Graphic(GRASS_FOREGROUND)
 
     def get_active_player_frame(self):
         return self.active_player_animation.get_frame()
@@ -78,6 +79,8 @@ class Animator:
 
         for anim in self.grass_animations:
             anim.rescale_frames(scale)
+
+        self.grass_foreground.rescale(scale)
 
     def new_grass_animation(self):
         return Animation([Graphic(GRASS_1), Graphic(GRASS_2), Graphic(GRASS_3)], 3, FRAMES_PER_GRASS_ANIMATION)

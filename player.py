@@ -78,6 +78,9 @@ class Player:
 
     def is_moving_up(self):
         return self.direction == UP and self.is_moving()
+    
+    def is_moving_down(self):
+        return self.direction == DOWN and self.is_moving()
 
     def is_moving(self):
         return not self.is_standing()

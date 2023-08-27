@@ -26,8 +26,15 @@ class Renderer:
         self.shift_location()
 
         self.renderGraphic(location.graphic)
-        self.renderPlayer(animator)
-        self.renderGrass(animator, player, move_lock)
+
+        if len(animator.grass_animations) > 0:
+            self.render_grass(animator, player, move_lock)
+        else:
+            self.renderPlayer(animator)
+
+        if location.square_is_grass(row=player.y, col=player.x):
+            self.render_grass_bottom(location, animator, player, move_lock)
+
         self.renderGraphic(location.foreground_graphic)
         
         if game_state == GAME_MENU:
@@ -37,19 +44,50 @@ class Renderer:
 
         pygame.display.flip()
 
-    def renderGrass(self, animator, player, move_lock):
-        for i, anim in enumerate(animator.grass_animations):
-            if len(animator.grass_animations) == 2:
-                pass
+    def render_grass(self, animator, player, move_lock):        
+        if player.is_moving_down():
+            self.render_grass_tail(animator, player, move_lock)
+            self.renderPlayer(animator)
+            self.render_grass_head(animator, player, move_lock)
+        elif player.is_moving_up():
+            self.render_grass_head(animator, player, move_lock)
+            self.renderPlayer(animator)
+            self.render_grass_tail(animator, player, move_lock)
+        else:
+            self.renderPlayer(animator)
+            self.render_grass_head(animator, player, move_lock)
+            self.render_grass_tail(animator, player, move_lock)
 
-            x, y = anim[0]
-            x, y = self.map_to_window_position(x, y, player)
+    def render_grass_tail(self, animator, player, move_lock):
+        for animation in animator.grass_animations[:-1]:
+            x, y = animation[0]
+            x, y = self.get_grass_position(x, y, player, move_lock)
+            frame = animation[1].get_frame()
 
-            if player.is_moving():
-                x, y = self.shift_grass_animation(x, y, move_lock)
-            
-            frame = anim[1].get_frame()
             self.screen.blit(frame, (x, y))
+
+    def render_grass_head(self, animator, player, move_lock):
+        x, y = animator.grass_animations[-1][0]
+        x, y = self.get_grass_position(x, y, player, move_lock)
+        frame = animator.grass_animations[-1][1].get_frame()
+
+        self.screen.blit(frame, (x, y))
+
+    def render_grass_bottom(self, location, animator, player, move_lock):
+        if location.square_is_grass(row=player.y, col=player.x) and not player.is_moving_up():
+            frame = animator.grass_bottom.scaled_image
+            x, y = (player.x, player.y)
+            x, y = self.get_grass_position(x, y, player, move_lock)
+
+            self.screen.blit(frame, (x, y))
+
+    def get_grass_position(self, x, y, player, move_lock):
+        x, y = self.map_to_window_position(x, y, player)
+
+        if player.is_moving():
+            x, y = self.shift_grass_animation(x, y, move_lock)
+        
+        return x, y
 
     def renderPlayer(self, animator):
         self.screen.blit(animator.get_active_player_frame(), (self.player_x, self.player_y))
