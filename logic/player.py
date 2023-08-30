@@ -6,13 +6,13 @@ from constant.parameters import (
 
 class Player:
     def __init__(self) -> None:
-        self.x = 20
-        self.y = 22
+        self.x = 22
+        self.y = 8
 
-        self.prev_x = 20
-        self.prev_y = 22
+        self.prev_x = 22
+        self.prev_y = 8
 
-        self.action = STANDING # STANDING, WALKING, SPRINTING
+        self.action = STANDING # STANDING, WALKING, SPRINTING, JUMPING
         self.direction = DOWN # LEFT, RIGHT, UP, DOWN
 
     def get_viewport_coordinate(self):
@@ -70,6 +70,24 @@ class Player:
         if move:
             self.update_position()
 
+    def next_coordinates(self, direction=None):
+        next_x = self.x
+        next_y = self.y
+
+        if direction is None:
+            direction = self.direction
+
+        if direction == LEFT:
+            next_x -= 1
+        elif direction == RIGHT:
+            next_x += 1
+        elif direction == UP:
+            next_y -= 1
+        else:
+            next_y += 1
+
+        return next_x, next_y
+
     def is_at_edge(self, location):
         return self.x == 0 or self.y == 0 or self.x == location.width-1 or self.y == location.height-1
 
@@ -105,21 +123,3 @@ class Player:
     
     def get_move_state(self):
         return (self.action, self.direction)
-    
-    def next_coordinates(self, direction=None):
-        next_x = self.x
-        next_y = self.y
-
-        if direction is None:
-            direction = self.direction
-
-        if direction == LEFT:
-            next_x -= 1
-        elif direction == RIGHT:
-            next_x += 1
-        elif direction == UP:
-            next_y -= 1
-        else:
-            next_y += 1
-
-        return next_x, next_y

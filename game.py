@@ -10,7 +10,7 @@ from graphics.infoBox import GameMenu, DialogueBox
 from logic.location import Location
 from logic.player import Player
 from controller import Controller
-from logic.lock import Lock, MovementLock
+from logic.lock import Lock, TimedLock
 from utility import *
 
 import logic.movementHandler as movementHandler
@@ -32,14 +32,15 @@ controller = Controller(game_state)
 animator = Animator()
 renderer = Renderer(player)
 
+### DISPLAY BOXES ###
 game_menu = GameMenu()
 dialogue_box = DialogueBox()
 
 ### LOCKS ###
-move_lock = MovementLock()
+move_lock = TimedLock()
 outside_lock = Lock()
-arrow_lock = MovementLock()
-dialogue_lock = MovementLock()
+arrow_lock = TimedLock()
+dialogue_lock = TimedLock()
 
 ### LOG ###
 frames = 0

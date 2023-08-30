@@ -1,6 +1,6 @@
 ### TILED ###
 MAP_CSV_PATH = "maps/map_logic.csv"
-MAP_XML_PATH = "maps/map_logic.xml"
+BOARDS_XML_PATH = "maps/boards.xml"
 
 ### LOCATION images ###
 LOCATION_SPRITE = "images/maps/map.png"

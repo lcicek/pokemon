@@ -4,9 +4,9 @@ import xml.etree.ElementTree as ET
 import csv
 
 from graphics.graphic import Graphic
-from logic.interactor import Interactor
-from constant.paths import MAP_CSV_PATH, MAP_XML_PATH
-from constant.locationCodebook import *
+from logic.interactor import *
+from constant.paths import MAP_CSV_PATH, BOARDS_XML_PATH
+from constant.locationDictionary import *
 from constant.parameters import CHARACTERS_PER_LINE, UNIT_SIZE
 
 class Location:
@@ -21,25 +21,8 @@ class Location:
         self.width = self.graphic.width // UNIT_SIZE # width in tiles
         self.height = self.graphic.height // UNIT_SIZE # height in tiles
 
-    def square_is_grass(self, row, col):
-        return self.map[row][col] == GRASS
-
-    def square_is_solid(self, row, col, direction):
-        return self.map[row][col] == SOLID or self.square_is_blocking_ledge(row, col, direction) or isinstance(self.map[row][col], Interactor)
-
-    def square_is_ledge(self, row, col):
-        return self.map[row][col] == LEDGE_DOWN or self.map[row][col] == LEDGE_LEFT or self.map[row][col] == LEDGE_RIGHT
-
-    def square_is_blocking_ledge(self, row, col, direction):
-        wrong_direction = self.map[row][col] != direction
-        return self.square_is_ledge(row, col) and wrong_direction
-
-    def square_is_jumping_ledge(self, row, col, direction):
-        same_direction = self.map[row][col] == direction
-        return self.square_is_ledge(row, col) and same_direction
-
     def init_objects(self):
-        tree = ET.parse(MAP_XML_PATH)
+        tree = ET.parse(BOARDS_XML_PATH)
         root = tree.getroot()
 
         for tag in root:
@@ -47,7 +30,12 @@ class Location:
                 x = int(interactor.attrib['x'])
                 y = int(interactor.attrib['y'])
                 text = self.format_text(interactor.text)
-                self.map[y][x] = Interactor(text)
+
+                if tag.tag == 'boards':
+                    self.map[y][x] = Interactor(text)
+                elif tag.tag == 'pokeballs':
+                    text = self.prepend_pokeball_text(text)
+                    self.map[y][x] = Pokeball(text)
 
     def init_map(self):
         with open(MAP_CSV_PATH) as csv_file:
@@ -92,3 +80,23 @@ class Location:
             text.append(current_string)
 
         return text
+    
+    def prepend_pokeball_text(self, texts):
+        return ["You found one " + texts[0] + "."]
+
+    def square_is_grass(self, row, col):
+        return self.map[row][col] == GRASS
+
+    def square_is_solid(self, row, col, direction):
+        return self.map[row][col] == SOLID or self.square_is_blocking_ledge(row, col, direction) or isinstance(self.map[row][col], Interactor)
+
+    def square_is_ledge(self, row, col):
+        return self.map[row][col] == LEDGE_DOWN or self.map[row][col] == LEDGE_LEFT or self.map[row][col] == LEDGE_RIGHT
+
+    def square_is_blocking_ledge(self, row, col, direction):
+        wrong_direction = self.map[row][col] != direction
+        return self.square_is_ledge(row, col) and wrong_direction
+
+    def square_is_jumping_ledge(self, row, col, direction):
+        same_direction = self.map[row][col] == direction
+        return self.square_is_ledge(row, col) and same_direction

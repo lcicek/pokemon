@@ -1,8 +1,6 @@
 from constant.parameters import (
     WALKING, STANDING, JUMPING, SPRINTING,
-    LEFT, RIGHT, UP,
-    FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP, 
-    B
+    FRAMES_PER_TURN, FRAMES_PER_WALK, FRAMES_PER_SPRINT, FRAMES_PER_JUMP,
 )
 
 def handle_movement(controller, player, location, move_lock, outside_lock):
@@ -15,7 +13,8 @@ def handle_movement(controller, player, location, move_lock, outside_lock):
             move_lock.lock(movement_duration)
 
 def execute_movement(input_direction, player, location, sprinting=False):
-    if input_direction is None and player.is_standing(): # player stands and there is no new input:
+    # player stands and there is no new input:
+    if input_direction is None and player.is_standing():
         return 0
 
     player_stopped_moving = input_direction is None and player.is_moving()
@@ -31,10 +30,10 @@ def execute_movement(input_direction, player, location, sprinting=False):
     elif next_square_is_jumpable(player, location, input_direction):
         jump(player, input_direction)
         return FRAMES_PER_JUMP
-    elif next_square_is_walkable(player, location, input_direction) and sprinting:
+    elif sprinting and next_square_is_walkable(player, location, input_direction):
         sprint(player, input_direction)
         return FRAMES_PER_SPRINT
-    elif next_square_is_walkable(player, location, input_direction) and not sprinting:
+    elif not sprinting and next_square_is_walkable(player, location, input_direction):
         walk(player, input_direction)
         return FRAMES_PER_WALK
     else:

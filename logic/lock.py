@@ -17,7 +17,7 @@ class Lock:
     def is_newly_locked(self):
         return self.frames_since_start == 1
 
-class MovementLock(Lock):
+class TimedLock(Lock):
     def __init__(self) -> None:
         super().__init__()
 
