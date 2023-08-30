@@ -76,6 +76,9 @@ class Player:
     def turns(self, new_direction):
         return self.direction != new_direction
 
+    def is_moving_horizontally(self):
+        return self.direction == LEFT or self.direction == RIGHT
+
     def is_moving_up(self):
         return self.direction == UP and self.is_moving()
     

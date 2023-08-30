@@ -21,13 +21,24 @@ class Renderer:
 
     def render(self, player, location, animator, move_lock, game_state, game_menu, dialogue_box):
         self.screen.fill("black")
-        self.update_shift(player, move_lock)
-        self.shift_location()
 
+        # set shift value for smooth location movement:
+        if move_lock.is_newly_locked():
+            self.update_shift(player, move_lock)
+
+        # move the location:
+        if move_lock.is_locked():    
+            self.shift_location(move_lock)
+        else:
+            # check for correctness of location (especially after shifting it):
+            assert self.location_x == -(player.x - X_HALF)*self.unit_size and self.location_y == -(player.y - Y_HALF)*self.unit_size
+
+        # render the location:
         self.render_graphic(location.graphic)
 
+        # render potential grass animations:
         if len(animator.grass_animations) > 0:
-            self.render_grass(animator, player, move_lock) # also handles rendering of player
+            self.render_grass(animator, player, move_lock) # also handles rendering of player because we render grass animations as: background grass => player => foreground grass
         else:
             self.render_player(animator)
 
@@ -142,9 +153,14 @@ class Renderer:
         self.render_infobox(game_menu)
         self.render_infobox_arrow(game_menu)
 
-    def shift_location(self):
+    def shift_location(self, move_lock):
         self.location_x += self.shift_x
         self.location_y += self.shift_y
+
+        # prevent rounding errors (e.g.: shift = 1/30 = 0.33333 and 30/30 = 0.9999999):
+        if move_lock.will_be_unlocked():
+            self.location_x = round(self.location_x)
+            self.location_y = round(self.location_y)
 
     def shift_grass_animation(self, x, y, move_lock):
         x += self.shift_x * move_lock.frames_since_start
@@ -153,21 +169,17 @@ class Renderer:
         return x, y
 
     def update_shift(self, player, move_lock):
-        if player.is_standing() or player.bumped():
-            assert self.location_x == -(player.x - X_HALF)*self.unit_size and self.location_y == -(player.y - Y_HALF)*self.unit_size
-            self.shift_x = 0
-            self.shift_y = 0
-            return
-
+        """
+        To ensure smooth player movement, the location has to be shifted by a small increment every
+        frame. This function takes the current move duration (which differs for walking, sprinting etc.),
+        and divides it into increments ("shifts") of 1/duration that are added/subtracted to the location
+        position depending on the direction of the movement.
+        """
         step_x, step_y = player.get_delta()
-        total_steps = move_lock.lock_duration
 
         # shift values are inverted since player moving right means shifting the location to the left
-        shift_x = -(step_x / total_steps)
-        shift_y = -(step_y / total_steps)
-
-        self.shift_x = shift_x * self.unit_size
-        self.shift_y = shift_y * self.unit_size
+        self.shift_x = -(step_x / move_lock.lock_duration) * self.unit_size
+        self.shift_y = -(step_y / move_lock.lock_duration) * self.unit_size
 
     def map_to_window_position(self, x, y, player):
         """
