@@ -1,6 +1,8 @@
 # Pokemon Clone (ongoing project)
 ## Demo (gif takes some time to load): ##
 ![](https://github.com/lcicek/pokemon/blob/master/demo.gif)
+<br>
+<i>Note: quality and frame rate is lowered significantly due to gif-file size constraints.</i>
 ## Progress: ##
 Current functionalities include:
 <ul>
