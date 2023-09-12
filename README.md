@@ -1,5 +1,6 @@
 # Pokemon Clone (ongoing project)
-
+## Demo (gif takes some time to load): ##
+![](https://github.com/lcicek/pokemon/blob/master/demo.gif)
 ## Progress: ##
 Current functionalities include:
 <ul>
